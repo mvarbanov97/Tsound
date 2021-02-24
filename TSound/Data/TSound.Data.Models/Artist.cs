@@ -2,7 +2,7 @@
 
 namespace TSound.Data.Models
 {
-    public class Class1
+    public class Artist
     {
     }
 }

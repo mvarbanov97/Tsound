@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TSound.Data;
+using TSound.Data.Models;
 using TSound.Web.Data;
 
 namespace TSound.Web
@@ -27,11 +29,29 @@ namespace TSound.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<TSoundDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<TSoundDbContext>();
+
+            services.AddDefaultIdentity<User>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true; //Default.
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.DefaultLockoutTimeSpan = new TimeSpan(0, 5, 0); // Default = 5 min
+                options.Lockout.MaxFailedAccessAttempts = 3; // Default = 5 attempts
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredUniqueChars = 1; // Default = 1 unique char
+            })
+            .AddRoles<Role>()
+            .AddEntityFrameworkStores<TSoundDbContext>();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
