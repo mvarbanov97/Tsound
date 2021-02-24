@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TSound.Data.Repositories.Contracts;
@@ -12,13 +13,15 @@ namespace TSound.Data.Repositories
 
         protected TSoundDbContext Context { get; set; }
 
-        protected readonly DbSet<T> DbSet;
+        protected DbSet<T> DbSet;
 
         public Repository(TSoundDbContext context)
         {
             this.Context = context;
             this.DbSet = this.Context.Set<T>();
         }
+
+        public virtual IQueryable<T> All() => this.DbSet;
 
         public async Task AddAsync(T entity)
         {

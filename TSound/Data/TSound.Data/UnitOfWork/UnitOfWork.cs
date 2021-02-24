@@ -16,9 +16,18 @@ namespace TSound.Data.UnitOfWork
         {
             this.Context = context;
             this.Genres = new Repository<Genre>(context);
+            this.Songs = new Repository<Song>(context);
+            this.Albums = new Repository<Album>(context);
+            this.Artists = new Repository<Artist>(context);
         }
 
         public IRepository<Genre> Genres { get; private set; }
+
+        public IRepository<Song> Songs { get; private set; }
+
+        public IRepository<Album> Albums { get; private set; }
+
+        public IRepository<Artist> Artists { get; private set; }
 
         public async Task<int> CompleteAsync()
         {

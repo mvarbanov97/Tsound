@@ -11,6 +11,12 @@ namespace TSound.Data.UnitOfWork
     {
         IRepository<Genre> Genres { get; }
 
+        IRepository<Song> Songs { get; }
+
+        IRepository<Album> Albums { get; }
+
+        IRepository<Artist> Artists { get; }
+
         Task<int> CompleteAsync();
     }
 }
