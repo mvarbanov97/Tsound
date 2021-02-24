@@ -13,6 +13,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Data;
 using TSound.Data.Models;
+using TSound.Services;
+using TSound.Services.Contracts;
+using TSound.Services.Models.MappingConfiguration;
+using TSound.Services.Providers;
 
 namespace TSound.Web
 {
@@ -47,6 +51,14 @@ namespace TSound.Web
             })
             .AddRoles<Role>()
             .AddEntityFrameworkStores<TSoundDbContext>();
+
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+            services.AddTransient<IPlaylistService, PlaylistService>();
+            services.AddTransient<ISongService, SongService>();
+            services.AddTransient<IGenreService, GenreService>();
+            services.AddTransient<IUserService, UserService>();
+
+            services.AddAutoMapper(cfg => cfg.AddProfile<AutomapperProfile>());
 
             services.AddControllersWithViews();
             services.AddRazorPages();
