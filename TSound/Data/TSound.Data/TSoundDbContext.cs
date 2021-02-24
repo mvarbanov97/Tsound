@@ -7,11 +7,14 @@ namespace TSound.Data
 {
     public class TSoundDbContext : IdentityDbContext<User, Role, Guid>
     {
-        public TSoundDbContext(DbContextOptions options)
+        public TSoundDbContext(DbContextOptions<TSoundDbContext> options)
             : base(options)
         {
 
         }
+
+        public DbSet<Genre> Genres { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

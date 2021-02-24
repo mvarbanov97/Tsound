@@ -13,7 +13,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Data;
 using TSound.Data.Models;
-using TSound.Web.Data;
 
 namespace TSound.Web
 {
@@ -32,9 +31,6 @@ namespace TSound.Web
             services.AddDbContext<TSoundDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<TSoundDbContext>();
 
             services.AddDefaultIdentity<User>(options =>
             {
