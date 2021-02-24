@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.10" />
@@ -17,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Data\TSound.Data\TSound.Data.csproj" />
+    <ProjectReference Include="..\..\Services\TSound.Services.Models\TSound.Services.Models.csproj" />
+    <ProjectReference Include="..\..\Services\TSound.Services\TSound.Services.csproj" />
   </ItemGroup>
 
 </Project>
