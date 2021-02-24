@@ -23,18 +23,15 @@ namespace TSound.Data.Models
         [JsonProperty("tracklist")]
         public string SonglistUrl { get; set; }
 
+        [Required]
         [JsonProperty("artist")]
         public Artist Artist { get; set; }
         public Guid ArtistId { get; set; }
-
-        [JsonProperty("contributors")]
-        public IList<Artist> Contributors { get; set; }
 
         [Required]
         [JsonProperty("tracks")]
         public IList<Song> Songs { get; set; }
 
         public int SongCount { get; set; }
-
     }
 }

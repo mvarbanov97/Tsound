@@ -25,21 +25,6 @@ namespace TSound.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Genres",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    DeezerId = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    PictureURL = table.Column<string>(nullable: true),
-                    SongCount = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Genres", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 schema: "dbo",
                 columns: table => new
@@ -84,25 +69,6 @@ namespace TSound.Data.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Song",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    GenreId = table.Column<Guid>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Song", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Song_Genres_GenreId",
-                        column: x => x.GenreId,
-                        principalTable: "Genres",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,11 +188,6 @@ namespace TSound.Data.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Song_GenreId",
-                table: "Song",
-                column: "GenreId");
-
-            migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 schema: "dbo",
                 table: "Users",
@@ -259,17 +220,11 @@ namespace TSound.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Song");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Users",
                 schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "Genres");
         }
     }
 }

@@ -45,5 +45,6 @@ namespace TSound.Data.Models
 
         public ICollection<Album> Albums { get; set; } = new HashSet<Album>();
 
+
     }
 }

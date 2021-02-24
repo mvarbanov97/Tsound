@@ -10,7 +10,7 @@ using TSound.Data;
 namespace TSound.Data.Migrations
 {
     [DbContext(typeof(TSoundDbContext))]
-    [Migration("20210224154732_InitialCreate")]
+    [Migration("20210224212421_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,31 +126,6 @@ namespace TSound.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.Genre", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DeezerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PictureURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SongCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Genres");
-                });
-
             modelBuilder.Entity("TSound.Data.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -177,23 +152,6 @@ namespace TSound.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.Song", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<Guid?>("GenreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GenreId");
-
-                    b.ToTable("Song");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.User", b =>
@@ -311,13 +269,6 @@ namespace TSound.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.Song", b =>
-                {
-                    b.HasOne("TSound.Data.Models.Genre", null)
-                        .WithMany("Songs")
-                        .HasForeignKey("GenreId");
                 });
 #pragma warning restore 612, 618
         }

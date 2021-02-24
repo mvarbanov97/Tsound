@@ -48,10 +48,6 @@ namespace TSound.Data.Models
         public Artist Artist { get; set; }
         public Guid ArtistId { get; set; }
 
-        [JsonProperty("contributors")]
-        public IList<Artist> Contributors { get; set; }
-
-
         public Genre Genre { get; set; }
         public Guid GenreId { get; set; }
 
