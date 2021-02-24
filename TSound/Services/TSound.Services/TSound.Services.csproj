@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\TSound.Data\TSound.Data.csproj" />
+  </ItemGroup>
+
 </Project>

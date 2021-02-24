@@ -41,12 +41,19 @@ namespace TSound.Data.Models
         [Required]
         [JsonProperty("album")]
         public Album Album { get; set; }
+        public Guid AlbumId { get; set; }
 
         [Required]
         [JsonProperty("artist")]
         public Artist Artist { get; set; }
+        public Guid ArtistId { get; set; }
+
+        [JsonProperty("contributors")]
+        public IList<Artist> Contributors { get; set; }
+
 
         public Genre Genre { get; set; }
+        public Guid GenreId { get; set; }
 
     }
 }
