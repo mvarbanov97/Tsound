@@ -26,5 +26,6 @@ namespace TSound.Data.Models
 
         public ICollection<Song> Songs { get; set; } = new HashSet<Song>();
 
+        public ICollection<PlaylistGenre> Playlists { get; set; } = new HashSet<PlaylistGenre>();
     }
 }

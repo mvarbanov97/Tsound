@@ -51,5 +51,6 @@ namespace TSound.Data.Models
         public Genre Genre { get; set; }
         public Guid GenreId { get; set; }
 
+        public ICollection<PlaylistSong> Playlists { get; set; } = new HashSet<PlaylistSong>();
     }
 }
