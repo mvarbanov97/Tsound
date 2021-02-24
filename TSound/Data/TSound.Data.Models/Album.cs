@@ -16,7 +16,7 @@ namespace TSound.Data.Models
         public string DeezerId { get; set; }
 
         [Required]
-        [JsonProperty("name")]
+        [JsonProperty("title")]
         public string Name { get; set; }
 
         [Required]
@@ -30,7 +30,7 @@ namespace TSound.Data.Models
 
         [Required]
         [JsonProperty("tracks")]
-        public IList<Song> Songs { get; set; }
+        public ICollection<Song> Songs { get; set; } = new HashSet<Song>();
 
         public int SongCount { get; set; }
     }
