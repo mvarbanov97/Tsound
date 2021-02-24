@@ -21,6 +21,11 @@ namespace TSound.Data
 
         public DbSet<Song> Songs { get; set; }
 
+        public DbSet<Playlist> Playlists { get; set; }
+
+        public DbSet<PlaylistGenre> PlaylistsGenres { get; set; }
+
+        public DbSet<PlaylistSong> PlaylistSongs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,7 +33,6 @@ namespace TSound.Data
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
 
             modelBuilder.Entity<User>().ToTable("Users", "dbo");
-            
         }
     }
 }

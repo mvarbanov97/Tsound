@@ -5,12 +5,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20210224212627_AddedGenreTableToDatabase.cs" />
+    <Compile Remove="Migrations\20210224212627_AddedGenreTableToDatabase.Designer.cs" />
+    <Compile Remove="Migrations\20210224213021_AddedAlbumTableToDatabase.cs" />
+    <Compile Remove="Migrations\20210224213021_AddedAlbumTableToDatabase.Designer.cs" />
+    <Compile Remove="Migrations\20210224214924_AddedPlaylistTableToDatabase.cs" />
+    <Compile Remove="Migrations\20210224214924_AddedPlaylistTableToDatabase.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
