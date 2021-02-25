@@ -9,40 +9,30 @@ namespace TSound.Services.External
 {
     public class ApplicationCloudinary
     {
-        public static async Task<string> UploadImage(Cloudinary cloudinary, IFormFile image, string fileName)
+        public static async Task<string> UploadImage(Cloudinary cloudinary, IFormFile file, string fileName)
         {
-            if (image != null)
+            if (file == null)
+                return null;
+
+            byte[] image;
+
+            using var memoryStream = new MemoryStream();
+
+            await file.CopyToAsync(memoryStream);
+
+            image = memoryStream.ToArray();
+
+            using var destinationStream = new MemoryStream(image);
+
+            var uploadParams = new ImageUploadParams()
             {
-                byte[] destinationImage;
-                using (var memoryStream = new MemoryStream())
-                {
-                    await image.CopyToAsync(memoryStream);
-                    destinationImage = memoryStream.ToArray();
-                }
+                File = new FileDescription(fileName, destinationStream),
+                PublicId = fileName,
+            };
 
-                using (var ms = new MemoryStream(destinationImage))
-                {
-                    // Cloudinary doesn't work with [?, &, #, \, %, <, >]
-                    fileName = fileName.Replace("&", "And");
-                    fileName = fileName.Replace("#", "sharp");
-                    fileName = fileName.Replace("?", "questionMark");
-                    fileName = fileName.Replace("\\", "right");
-                    fileName = fileName.Replace("%", "percent");
-                    fileName = fileName.Replace(">", "greater");
-                    fileName = fileName.Replace("<", "lower");
+            var result = await cloudinary.UploadAsync(uploadParams);
 
-                    var uploadParams = new RawUploadParams()
-                    {
-                        File = new FileDescription(fileName, ms),
-                        PublicId = fileName,
-                    };
-
-                    var uploadResult = cloudinary.Upload(uploadParams);
-                    return uploadResult.SecureUri.AbsoluteUri;
-                }
-            }
-
-            return null;
+            return result.Url.AbsoluteUri;
         }
 
         public static void DeleteImage(Cloudinary cloudinary, string name, string folderName)

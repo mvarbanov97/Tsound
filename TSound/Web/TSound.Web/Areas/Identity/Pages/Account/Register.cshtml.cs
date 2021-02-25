@@ -108,7 +108,8 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                     DateCreated = DateTime.UtcNow,
                     DateModified = DateTime.UtcNow,
                     UserName = Input.Email,
-                    Email = Input.Email
+                    Email = Input.Email,
+                    ImageUrl = GlobalConstants.NoAvatarImageLocation,
                 };
 
                 var profileImageUrl = await ApplicationCloudinary.UploadImage(
@@ -122,9 +123,6 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                     {
                         user.ImageUrl = profileImageUrl;
                     }
-                } else
-                {
-                    user.ImageUrl = GlobalConstants.NoAvatarImageLocation;
                 }
 
                 var result = await this.userManager.CreateAsync(user, Input.Password);
