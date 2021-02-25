@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -54,6 +55,16 @@ namespace TSound.Web
             .AddUserManager<UserManager<User>>()
             .AddEntityFrameworkStores<TSoundDbContext>();
 
+
+            // Cloudinary Authentication
+            var cloudinaryAccount = new CloudinaryDotNet.Account(
+                this.Configuration["Cloudinary:CloudName"],
+                this.Configuration["Cloudinary:ApiKey"],
+                this.Configuration["Cloudinary:ApiSecret"]);
+            var cloudinary = new Cloudinary(cloudinaryAccount);
+            services.AddSingleton(cloudinary);
+
+            // Register Logic Services
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             services.AddTransient<IPlaylistService, PlaylistService>();
             services.AddTransient<ISongService, SongService>();
