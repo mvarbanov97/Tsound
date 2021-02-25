@@ -15,7 +15,7 @@ namespace TSound.Data.Models
 
         public DateTime DateModified { get; set; }
 
-        public string Image { get; set; }
+        public string ImageUrl { get; set; }
 
         public Guid ApiKey { get; set; }
 

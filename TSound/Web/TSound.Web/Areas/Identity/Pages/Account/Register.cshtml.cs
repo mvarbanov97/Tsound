@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +15,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using TSound.Common;
 using TSound.Data.Models;
+using TSound.Services.External;
 
 namespace TSound.Web.Areas.Identity.Pages.Account
 {
@@ -25,17 +28,20 @@ namespace TSound.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> userManager;
         private readonly ILogger<RegisterModel> logger;
         private readonly IEmailSender emailSender;
+        private readonly Cloudinary cloudinary;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            Cloudinary cloudinary)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.logger = logger;
             this.emailSender = emailSender;
+            this.cloudinary = cloudinary;
         }
 
         [BindProperty]
@@ -71,12 +77,13 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             [Display(Name = "Password")]
             public string Password { get; set; }
 
+            [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public string Image { get; set; }
+            public string ImageUrl { get; set; }
 
             public IFormFile ImageFile { get; set; }
 
@@ -103,6 +110,22 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                     UserName = Input.Email,
                     Email = Input.Email
                 };
+
+                var profileImageUrl = await ApplicationCloudinary.UploadImage(
+                this.cloudinary,
+                this.Input.ImageFile,
+                string.Format(GlobalConstants.CloudinaryUserProfilePictureName, user.UserName));
+
+                if (profileImageUrl != null)
+                {
+                    if (profileImageUrl != user.ImageUrl)
+                    {
+                        user.ImageUrl = profileImageUrl;
+                    }
+                } else
+                {
+                    user.ImageUrl = GlobalConstants.NoAvatarImageLocation;
+                }
 
                 var result = await this.userManager.CreateAsync(user, Input.Password);
 
