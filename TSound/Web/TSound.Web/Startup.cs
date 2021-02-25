@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Data;
 using TSound.Data.Models;
+using TSound.Data.UnitOfWork;
 using TSound.Services;
 using TSound.Services.Contracts;
 using TSound.Services.Models.MappingConfiguration;
@@ -50,6 +51,7 @@ namespace TSound.Web
                 options.Password.RequiredUniqueChars = 1; // Default = 1 unique char
             })
             .AddRoles<Role>()
+            .AddUserManager<UserManager<User>>()
             .AddEntityFrameworkStores<TSoundDbContext>();
 
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -57,10 +59,11 @@ namespace TSound.Web
             services.AddTransient<ISongService, SongService>();
             services.AddTransient<IGenreService, GenreService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddAutoMapper(cfg => cfg.AddProfile<AutomapperProfile>());
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
         }
 
