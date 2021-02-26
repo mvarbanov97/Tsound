@@ -29,11 +29,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSound.Services.Tests", "Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSound.Controllers.Tests", "Tests\TSound.Controllers.Tests\TSound.Controllers.Tests.csproj", "{1CD4FD1B-8438-49D0-B4DF-36D20EA22132}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSound.Services.External", "Services\TSound.Services.External\TSound.Services.External.csproj", "{8A08D71A-FF70-4D55-B21F-45CF420C1524}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSound.Services.External", "Services\TSound.Services.External\TSound.Services.External.csproj", "{8A08D71A-FF70-4D55-B21F-45CF420C1524}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{92D2F784-2DA9-426B-8DA2-96657A6DE5FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSound.Common", "Common\TSound.Common\TSound.Common.csproj", "{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSound.Common", "Common\TSound.Common\TSound.Common.csproj", "{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSound.Data.Seeder", "Tsond.Data.Seeder\TSound.Data.Seeder.csproj", "{A765DD29-63C7-40C9-82E5-4A36F145EBAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A765DD29-63C7-40C9-82E5-4A36F145EBAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A765DD29-63C7-40C9-82E5-4A36F145EBAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A765DD29-63C7-40C9-82E5-4A36F145EBAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A765DD29-63C7-40C9-82E5-4A36F145EBAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +102,7 @@ Global
 		{1CD4FD1B-8438-49D0-B4DF-36D20EA22132} = {800BCCDC-9CFF-4FFE-8A66-121E1D505030}
 		{8A08D71A-FF70-4D55-B21F-45CF420C1524} = {4988B194-DF12-4549-92D4-150F5C2681E0}
 		{89AC2BAF-A8E8-4BB4-80AA-E0FF69EA58D9} = {92D2F784-2DA9-426B-8DA2-96657A6DE5FC}
+		{A765DD29-63C7-40C9-82E5-4A36F145EBAC} = {B0583BDA-F708-49DC-881F-A65BEADD3818}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1EC142F3-F40C-450B-98BF-15FA8E11C596}

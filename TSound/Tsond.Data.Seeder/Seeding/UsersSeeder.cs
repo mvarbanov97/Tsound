@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 
-namespace TSound.Data.Seeding
+namespace TSound.Data.Seeder.Seeding
 {
     public class UsersSeeder : ISeeder
     {

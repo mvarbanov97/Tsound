@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
-namespace TSound.Data.Seeding
+namespace TSound.Data.Seeder.Seeding
 {
     public class TSoundDbContextSeeder : ISeeder
     {
@@ -21,7 +21,10 @@ namespace TSound.Data.Seeding
 
             var seeders = new List<ISeeder>
             {
-                new RolesSeeder()
+                new RolesSeeder(),
+                new AdminsSeeder(),
+                new UsersSeeder(),
+                new GenresSeeder(dbContext),
             };
 
             foreach (var seeder in seeders)

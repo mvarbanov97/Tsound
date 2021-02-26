@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 
-namespace TSound.Data.Seeding
+namespace TSound.Data.Seeder.Seeding
 {
     public class AdminsSeeder : ISeeder
     {
