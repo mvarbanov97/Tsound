@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\TSound.Services\TSound.Services.csproj" />
+    <ProjectReference Include="..\TSound.Data.Models\TSound.Data.Models.csproj" />
+    <ProjectReference Include="..\TSound.Data\TSound.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -24,7 +24,8 @@ namespace TSound.Data.Seeder.Seeding
                 new RolesSeeder(),
                 new AdminsSeeder(),
                 new UsersSeeder(),
-                new GenresSeeder(dbContext),
+                new GenresSeeder(),
+                new SongsSeeder(),
             };
 
             foreach (var seeder in seeders)

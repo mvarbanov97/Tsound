@@ -10,17 +10,11 @@ namespace TSound.Data.Seeder.Seeding
     public class GenresSeeder : ISeeder
     {
         private GenreService genreService;
-        private TSoundDbContext dbContext;
         private UnitOfWork.UnitOfWork unitOfWork;
 
-        public GenresSeeder(TSoundDbContext dbContext)
+        public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
-            this.dbContext = dbContext;
-            this.unitOfWork = new UnitOfWork.UnitOfWork(this.dbContext);
-        }
-
-        public async Task SeedAsync(this TSoundDbContext dbContext , IServiceProvider serviceProvider)
-        {
+            this.unitOfWork = new UnitOfWork.UnitOfWork(dbContext);
             this.genreService = new GenreService(this.unitOfWork);
             await this.genreService.LoadGenresInDbAsync();
         }
