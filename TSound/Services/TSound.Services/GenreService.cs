@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
@@ -19,6 +22,18 @@ namespace TSound.Services
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+        }
+
+        public async Task<GenreServiceModel> GetGenreByIdAsync(Guid genreId)
+        {
+            var genre = await this.unitOfWork.Genres.All().FirstOrDefaultAsync(x => x.Id == genreId);
+
+            if (genre == null)
+                throw new ArgumentNullException("Genre Not Found.");
+
+            var genreServiceModel = this.mapper.Map<GenreServiceModel>(genre);
+
+            return genreServiceModel;
         }
 
         public async Task<IEnumerable<GenreServiceModel>> GetAllGenresAsync(bool requireApiKey = false, System.Guid? apiKey = null)

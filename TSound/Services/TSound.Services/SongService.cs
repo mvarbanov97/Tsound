@@ -37,6 +37,9 @@ namespace TSound.Services
                 .Include(s => s.Genre)
                 .FirstOrDefaultAsync(s => s.Id == songId);
 
+            if (song == null)
+                throw new ArgumentNullException("Song Not Found.");
+
             var songServiceModel = this.mapper.Map<SongServiceModel>(song);
 
             return songServiceModel;
