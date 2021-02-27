@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TSound.Data;
 
 namespace TSound.Data.Migrations
 {
     [DbContext(typeof(TSoundDbContext))]
-    partial class TSoundDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210226184247_AddedNewColumnsToPlaylistEntity")]
+    partial class AddedNewColumnsToPlaylistEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,9 +242,6 @@ namespace TSound.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DurationTravel")
-                        .HasColumnType("int");
-
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -339,8 +338,8 @@ namespace TSound.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
+                    b.Property<double>("Duration")
+                        .HasColumnType("float");
 
                     b.Property<Guid>("GenreId")
                         .HasColumnType("uniqueidentifier");

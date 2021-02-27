@@ -9,10 +9,19 @@ namespace TSound.Data.Models
         public Guid Id { get; set; }
 
         public string Name { get; set; }
+        public string Description { get; set; }
 
-        //public int Duration { get; set; }
+        public DateTime DateCreated { get; set; }
 
-        //public int Rank { get; set; }
+        public DateTime DateModified { get; set; }
+
+        public string Image { get; set; }
+
+        public int DurationTravel { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        public bool IsUnlisted { get; set; }
 
         public Guid UserId { get; set; }
         public User User { get; set; }

@@ -25,7 +25,7 @@ namespace TSound.Data.Models
 
         [Required]
         [JsonProperty("duration")]
-        public double Duration { get; set; }
+        public int Duration { get; set; }
 
         [Required]
         [JsonProperty("rank")]
