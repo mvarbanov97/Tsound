@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace TSound.Services.Models
+namespace TSound.Web.Models.ViewModels.Playlist
 {
-    public class PlaylistServiceModel
+    public class PlaylistViewModel
     {
         public Guid Id { get; set; }
 
@@ -31,5 +32,6 @@ namespace TSound.Services.Models
         public Guid UserId { get; set; }
         public string UserName { get; set; }
         public string UserImage { get; set; }
+
     }
 }

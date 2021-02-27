@@ -1,0 +1,44 @@
+﻿@model PlaylistCollectionViewModel
+
+@{ ViewData["Title"] = "All";
+                Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+    <div class="col-md-3">
+        <input type="button" value="Create" onclick="window.location='@Url.Action("Create", "Playlists")'" class="btn btn-primary" />
+    </div>
+    <div class="col-md-6 text-center">
+        <h1>Playlists</h1>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<div class="row">
+    @foreach (var item in Model.CollectionPlaylists)
+    {
+<div class="col-md-3 border border-warning" id="div-chamfered-bordered-thick">
+    <div class="text-center">
+        <br />
+        <img src="@item.Image" id="img-circle" height="300" />
+        <br />
+        <br />
+    </div>
+    <p><b>Id:</b> @item.Id</p>
+    <p><b>Name:</b> @item.Name</p>
+    <p><b>Description:</b> @item.Description</p>
+    <hr />
+    <p><b>Date Created:</b> @item.DateCreated</p>
+    <p><b>Date Modified:</b> @item.DateModified</p>
+    <hr />
+    <p><b>Duration Playlist:</b> ~@(item.DurationPlaylist / 60) minutes</p>
+    <p><b>Duration Travel:</b> ~@(item.DurationTravel / 60) minutes</p>
+    <p><b>Rank:</b> @item.Rank</p>
+    <hr />
+    <p><b>Is Deleted:</b> @item.IsDeleted</p>
+    <p><b>Is Unlisted:</b> @item.IsUnlisted</p>
+    <hr />
+    <p><b>User Id:</b> @item.UserId</p>
+    <p><b>User Name:</b> @item.UserName</p>
+    <p><b>User Image:</b> <img src="@item.UserImage" height="50" /></p>
+</div>}
+</div>

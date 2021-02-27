@@ -1,0 +1,83 @@
+﻿@model PlaylistCreateFormInputModel
+
+@{ ViewData["Title"] = "Create";
+                Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h1>Create</h1>
+
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 border border-primary" id="div-chamfered-bordered-thick">
+        <form asp-controller="Playlists" asp-action="Create" method="post" class="form" enctype="multipart/form-data">
+
+            <div asp-validation-summary="All" class="text-danger"></div> <!--UL list -->
+
+            <hr />
+            <p><b>Travel information:</b></p>
+
+            <br />
+            <button type="button" id="buttonLocation" onclick="getLocation()" class="text-center btn btn-sm btn-outline-primary">Share Location</button>
+
+            <hr />
+            <p><b>Preferences:</b></p>
+
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div>
+                <hr />
+                <label>Attach Image</label><br />
+                <input type="file" name="ImageFile" />
+                <hr />
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                <label asp-for="IsTopTracksOptionUsed" class="form-check-label">Use top tracks</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked="checked">
+                <label asp-for="IsTracksFromSameArtistAllowed" class="form-check-label active">Allow tracks from the same artist</label>
+            </div>
+            <br />
+
+            <input type="submit" value="Submit" class="btn btn-outline-primary" />
+            <br /><br />
+        </form>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+<script>
+    function getLocation() {
+        document.getElementById('buttonLocation').style.visibility = "hidden";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(getCoordinates);
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            console.log(latitude);
+            console.log(longitude);
+        }
+        else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
+
+    function getCoordinates(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        console.log(latitude);
+        console.log(longitude);
+    }
+</script>
