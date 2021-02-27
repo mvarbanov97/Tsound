@@ -8,6 +8,8 @@ namespace TSound.Services.Contracts
 {
     public interface IUserService : IService
     {
+        Task<IEnumerable<UserServiceModel>> GetAllUsersAsync();
+
         Task<UserServiceModel> GetUserByEmailAsync(string email);
     }
 }

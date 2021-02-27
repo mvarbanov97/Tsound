@@ -24,6 +24,24 @@ namespace TSound.Services
             this.mapper = mapper;
         }
 
+        public async Task<IEnumerable<UserServiceModel>> GetAllUsersAsync()
+        {
+            var users = await this.unitOfWork.Users.All().ToListAsync();
+
+            return users.Select(user => new UserServiceModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateCreated = user.DateCreated,
+                DateModified = user.DateModified,
+                Image = user.ImageUrl,
+                IsAdmin = user.IsAdmin,
+                IsBanned = user.IsBanned,
+                IsDeleted = user.IsDeleted,
+            });
+        }
+
         public async Task<UserServiceModel> GetUserByEmailAsync(string email)
         {
             var user = await this.unitOfWork.Users.All().Where(x => x.Email == email).FirstOrDefaultAsync();
