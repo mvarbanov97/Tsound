@@ -7,7 +7,7 @@
     using TSound.Data;
     using TSound.Data.UnitOfWork;
     using TSound.Services;
-    using TSound.Services.Models.MappingConfiguration;
+    using TSound.Web.MappingConfiguration;
 
     public class Program
     {
@@ -25,7 +25,7 @@
             var genreService = new GenreService(unitOfWork, mapper);
             await genreService.LoadGenresInDbAsync();
 
-            var songService = new SongService(unitOfWork);
+            var songService = new SongService(unitOfWork, mapper);
             await songService.LoadSongsInDbAsync(); // This takes quite a while, because we must not exceed request quota for Deezer
         }
     }

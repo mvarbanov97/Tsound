@@ -45,7 +45,7 @@ namespace TSound.Services
             return songServiceModel;
         }
 
-        public async Task<IEnumerable<SongServiceModel>> GetAllSongsAsync(Guid songId)
+        public async Task<IEnumerable<SongServiceModel>> GetAllSongsAsync()
         {
             var songs = this.unitOfWork.Songs.All()
                 .Include(s => s.Album)

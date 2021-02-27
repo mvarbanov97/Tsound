@@ -10,7 +10,7 @@ namespace TSound.Services.Contracts
     {
         Task<SongServiceModel> GetSongByIdAsync(Guid songId);
 
-        Task<IEnumerable<SongServiceModel>> GetAllSongsAsync(Guid songId);
+        Task<IEnumerable<SongServiceModel>> GetAllSongsAsync();
 
         Task LoadSongsInDbAsync();
     }

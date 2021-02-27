@@ -4,8 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TSound.Data.Models;
+using TSound.Services.Models;
+using TSound.Web.Models.ViewModels.Album;
+using TSound.Web.Models.ViewModels.Artist;
+using TSound.Web.Models.ViewModels.Genre;
+using TSound.Web.Models.ViewModels.Song;
 
-namespace TSound.Services.Models.MappingConfiguration
+namespace TSound.Web.MappingConfiguration
 {
     public class AutomapperProfile : Profile
     {
@@ -32,6 +37,14 @@ namespace TSound.Services.Models.MappingConfiguration
                 .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Artist.Name));
 
             this.CreateMap<Artist, ArtistServiceModel>();
+
+            this.CreateMap<GenreServiceModel, GenreViewModel>().ReverseMap();
+
+            this.CreateMap<SongServiceModel, SongViewModel>().ReverseMap();
+
+            this.CreateMap<AlbumServiceModel, AlbumViewModel>().ReverseMap();
+
+            this.CreateMap<ArtistServiceModel, ArtistViewModel>().ReverseMap();
         }
     }
 }
