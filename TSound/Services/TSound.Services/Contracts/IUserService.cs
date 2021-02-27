@@ -9,8 +9,5 @@ namespace TSound.Services.Contracts
     public interface IUserService : IService
     {
         Task<UserServiceModel> GetUserByEmailAsync(string email);
-
-        Task<bool> UpdateUserImageAsync(Guid id);
-
     }
 }
