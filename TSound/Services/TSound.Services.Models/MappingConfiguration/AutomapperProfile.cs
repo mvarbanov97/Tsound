@@ -21,6 +21,12 @@ namespace TSound.Services.Models.MappingConfiguration
             this.CreateMap<Genre, GenreServiceModel>();
 
             this.CreateMap<User, UserServiceModel>().ReverseMap();
+
+            this.CreateMap<Song, SongServiceModel>()
+                .ForMember(dest => dest.Album, opt => opt.MapFrom(src => src.Album.Name))
+                .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Artist.Name))
+                .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.Name))
+                .ReverseMap();
         }
     }
 }

@@ -8,6 +8,8 @@ namespace TSound.Services.Contracts
 {
     public interface IGenreService : IService
     {
+        Task<GenreServiceModel> GetGenreByIdAsync(Guid genreId);
+
         Task<IEnumerable<GenreServiceModel>> GetAllGenresAsync(bool requireApiKey = false, Guid? apiKey = null);
     }
 }
