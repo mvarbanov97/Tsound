@@ -1,20 +1,39 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using AutoMapper;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
+using TSound.Services.Models;
 
 namespace TSound.Services
 {
-    public class GenreService: IGenreService
+    public class GenreService : IGenreService
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IMapper mapper;
 
-        public GenreService(IUnitOfWork unitOfWork)
+        public GenreService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
+        }
+
+        public async Task<IEnumerable<GenreServiceModel>> GetAllGenresAsync(bool requireApiKey = false, System.Guid? apiKey = null)
+        {
+            if (requireApiKey)
+                await this.ValidateAPIKeyAsync(apiKey, this.unitOfWork);
+
+            var genres = this.unitOfWork.Genres.All();
+
+            if (genres == null)
+                return new List<GenreServiceModel>();
+
+            var result = this.mapper.Map<IEnumerable<GenreServiceModel>>(genres);
+
+            return result;
         }
 
         public async Task LoadGenresInDbAsync()
@@ -34,11 +53,10 @@ namespace TSound.Services
         {
             string url = $"https://api.deezer.com/genre/{genreId}";
 
-            string jsonGenre = await this.GetJsonStreamFromDeezerAsync(url);
+            string jsonGenre = await this.GetJsonStreamFromUrlAsync(url);
             Genre genre = JsonConvert.DeserializeObject<Genre>(jsonGenre);
 
             return genre;
         }
-
     }
 }
