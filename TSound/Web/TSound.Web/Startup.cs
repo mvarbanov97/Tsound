@@ -70,6 +70,8 @@ namespace TSound.Web
             services.AddTransient<ISongService, SongService>();
             services.AddTransient<IGenreService, GenreService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAlbumService, AlbumService>();
+            services.AddTransient<IArtistService, ArtistService>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddAutoMapper(cfg => cfg.AddProfile<AutomapperProfile>());
