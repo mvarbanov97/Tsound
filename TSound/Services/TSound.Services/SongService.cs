@@ -116,7 +116,7 @@ namespace TSound.Services
 
             foreach (var url in trackListsUrls)
             {
-                jsonTrackList = await this.GetJsonStreamFromDeezerAsync(url);
+                jsonTrackList = await this.GetJsonStreamFromUrlAsync(url);
                 trackList = JsonConvert.DeserializeObject<DeezerTrackList>(jsonTrackList);
 
                 songs.AddRange(trackList.Songs);
@@ -146,7 +146,7 @@ namespace TSound.Services
         {
             string url = $"https://api.deezer.com/search/playlist?q={genre}";
 
-            string jsonPlaylist = await this.GetJsonStreamFromDeezerAsync(url);
+            string jsonPlaylist = await this.GetJsonStreamFromUrlAsync(url);
 
             DeezerPlaylistData playlistsData = JsonConvert.DeserializeObject<DeezerPlaylistData>(jsonPlaylist);
             var playlists = playlistsData.Playlists;

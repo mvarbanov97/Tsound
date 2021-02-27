@@ -1,11 +1,13 @@
 ﻿namespace TSound.Console
 {
+    using AutoMapper;
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Threading.Tasks;
     using TSound.Data;
     using TSound.Data.UnitOfWork;
     using TSound.Services;
+    using TSound.Services.Models.MappingConfiguration;
 
     public class Program
     {
@@ -16,8 +18,11 @@
             .Options);
 
             var unitOfWork = new UnitOfWork(db);
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutomapperProfile>());
+            var mapper = new Mapper(configuration);
 
-            var genreService = new GenreService(unitOfWork);
+
+            var genreService = new GenreService(unitOfWork, mapper);
             await genreService.LoadGenresInDbAsync();
 
             var songService = new SongService(unitOfWork);

@@ -11,6 +11,10 @@
     <Compile Remove="Migrations\20210224213021_AddedAlbumTableToDatabase.Designer.cs" />
     <Compile Remove="Migrations\20210224214924_AddedPlaylistTableToDatabase.cs" />
     <Compile Remove="Migrations\20210224214924_AddedPlaylistTableToDatabase.Designer.cs" />
+    <Compile Remove="Migrations\20210227150530_Test.cs" />
+    <Compile Remove="Migrations\20210227150530_Test.Designer.cs" />
+    <Compile Remove="Migrations\20210227150709_Test.cs" />
+    <Compile Remove="Migrations\20210227150709_Test.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,6 +8,8 @@
 
         public const string CloudinaryUserProfilePictureName = "{0}_ProfilePicture";
 
+        public const string CloudinaryPlaylistPictureName = "{0}_PlaylistPicture";
+
         public const string NoAvatarImageLocation = "/images/defaultProfileImage.png";
     }
 }
