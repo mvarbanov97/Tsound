@@ -2,7 +2,90 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-user">
+                    <div class="card-body">
+                        <div class="author">
+                            <div class="block block-one"></div>
+                            <div class="block block-two"></div>
+                            <div class="block block-three"></div>
+                            <div class="block block-four"></div>
+                            <div class="text-left">
+                                <img src="~/images/logo_text.png" height="40" alt="logo_text" />
+                            </div>
+                            <div class="" id="home-description" style="font-size: 17px;">
+                                <div class="card-header mb-5">
+                                    <h3 class="card-title text-secondary text-left" style="font-size: 80px; opacity: 0.75;">
+                                        <strong>Play your<br /> travel!</strong>
+                                    </h3>
+                                    <h4 class="card-title text-left text-secondary">
+                                        Create a list.&nbsp;&nbsp;Press "play".&nbsp;&nbsp;Enjoy your travel.
+                                    </h4>
+                                </div>
+                                <p class="text-left">
+                                    <input type="button" class="btn btn-lg btn-primary btn-round text-seconday" value="Create a Playlist!" onclick="window.location='@Url.Action("Create", "Playlists")'" style="opacity: 0.9" />
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center">
+                <h3>Check out our Top 3 Playlists:</h3>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            @*@foreach (var playlist in Model.Top3Playlists)
+            {*@
+                <div class="col-md-4">
+                    <div class="card p-3 text-center">
+                        <h4 class="text-center">Playlist Name </h4>
+                        <div class="text-center">
+                            <a href="@*@Url.Action("PlaylistById", "Playlists", new { id = playlist.Id })*@">
+                                <img src="playlist.Image" class="img-circle-lg" />
+                            </a>
+                        </div>
+                        <br />
+                        <p class="text-center" id="playlist-description" style="font-size: 14px;"><i>Playlist Description Here</i></p>
+                        <br />
+                        <div class="row text-center style=" font-size: 12px;"">
+                            <div class="col-md-4 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
+                            <div class="col-md-4 text-center"><p><i class="tim-icons icon-chart-bar-32"></i></p></div>
+                            <div class="col-md-4 text-center"><p style="font-size: 12px;">Songs</p></div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-md-4 text-center"><p style="font-size: 10px;">Playlist Duration Here min</p></div>
+                            <div class="col-md-4 text-center"><p style="font-size: 10px;">Playlist Rank</p></div>
+                            <div class="col-md-4 text-center"><p style="font-size: 10px;">Songs count Here</p></div>
+                        </div>
+                        <br />
+                        <div>
+                            @*<input type="button" class="btn btn-primary btn-round text-center" value="View" o onclick="window.location='@Url.Action("PlaylistById", "Playlists", new { id = playlist.Id })'">*@
+                        </div>
+                    </div>
+                </div>
+            @*}*@
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="text-center">Check out our Top 3 Songs:</h3>
+            </div>
+        </div>
+        @*<div class="row">
+            @foreach (var song in Model.Top3Songs)
+            {
+                <div class="col-md-4 text-center">
+                    <div class="card p-3">
+                        <partial name="_SongWidgetPartial_Small" model="song" />
+                    </div>
+                </div>
+            }
+        </div>*@
+    </div>
 </div>
+
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DWXbttAJcbphz" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>

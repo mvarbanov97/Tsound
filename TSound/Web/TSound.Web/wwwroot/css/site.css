@@ -1,78 +1,474 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
-#map {
-    margin: 0;
-    padding: 0;
-    height: 400px;
-    align-self: center;
+
+@import Url(template/black-dashboard.css);
+@import Url(template/black-dashboard.css.map);
+@import Url(template/black-dashboard.min.css);
+@import Url(template/nucleo-icons.css);
+
+@font-face {
+    font-family: Poppins;
+    src: url(fonts/Poppins-Light.ttf);
+}
+
+#home-description {
+    font-size: 23px;
+}
+
+#playlist-description {
+    font-size: 17px;
+}
+
+#news-column {
+    padding-left: 25px;
+    padding-right: 15px;
+    padding-bottom: 35px;
+}
+
+#news-card-body {
+    width: 50%;
+}
+
+#news-card-container {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#news-read-more {
+    width: 90%;
+}
+
+.play-button {
+}
+
+    .play-button.paused {
+    }
+
+    .play-button:hover {
+    }
+
+
+#view-genre-playlists-btn {
+    width: 80%;
+}
+
+#news-card {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#news-read-more {
+    width: 20%;
 }
 
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
 }
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
+}
+
+#genre-buttons {
+    background-color: yellow;
+}
+
+.genre-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: normal;
+    background-color: #ffffff;
+    background-clip: border-box;
+    border: 0.0625rem solid rgba(34, 42, 66, 0.05);
+    border-radius: 0.2857rem;
+    width: 50%;
+}
+
+
+.btn-genres {
+    color: #ffffff;
+    _background-color: #e14eca;
+    border-color: #e14eca;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+    .btn-genres:hover {
+        color: #ffffff;
+        background-color: #db2dc0;
+        border-color: #d725bb;
+    }
+
+
+.float-left btn btn-outline-dark, .float-right btn btn-outline-dark {
+    padding-left: 0 10px;
+    padding-right: 0 10px;
+}
+
+.card bg-dark {
+    padding-top: 10px;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
+
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    /*background-position: center;*/
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    overflow-x: hidden;
+    font-family: Poppins;
 }
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
 }
+
+#img-circle {
+    border-radius: 50%;
+}
+
+.img-logo-rect {
+    width: 75%;
+}
+
+.img-circle-lg {
+    border-radius: 50%;
+    width: 60%;
+}
+
+#div-chamfered-bordered-thick {
+    border-radius: 3%;
+    /*border-width: 10px !important;*/
+}
+
+.hr-thick {
+    border: none;
+    height: 2px;
+    /* Set the hr color */
+    color: #f0ad4e; /* old IE */
+    background-color: #f0ad4e; /* Modern Browsers */
+}
+
+.button-hover:hover {
+    color: #f0ad4e;
+}
+
+.container-iframe {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+}
+
+/* Then style the iframe to fit in the container div with full height and width */
+.responsive-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.table-responsive {
+    overflow: hidden;
+}
+
+/*filter container - slider, sort by, filter buttons*/
+.filter-container {
+    margin-bottom: 0;
+}
+
+#collapsable-link {
+    color: white;
+}
+
+#slider-range-duration, #slider-range-rank {
+    margin-top: 5px;
+}
+
+    #slider-range-duration .ui-state-default, #slider-range-rank .ui-state-default {
+        background: #e14eca;
+        border: none;
+        border-radius: 10px;
+    }
+
+.filter-form {
+    display: block;
+    color: white;
+}
+
+.flex-field, .flex-field-inner {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-space-between {
+    justify-content: space-between;
+}
+
+.flex-field-inner {
+    justify-content: space-around;
+    padding-left: 0;
+}
+
+.genre-sort-row {
+    padding-right: 15px;
+    padding-left: 15px;
+    padding-bottom: 15px;
+}
+
+.range-nums {
+    text-align: center;
+    color: #17A2B8;
+    font-weight: bold;
+}
+
+/*search btn, search modal start*/
+
+.search-btn {
+    max-height: 70px;
+    align-self: center;
+}
+
+.ui-menu .ui-menu-item {
+    color: black;
+}
+
+.modal-autocomplete {
+    display: flex;
+}
+
+/*search btn, search modal end*/
+
+/*login, register forms start*/
+.login-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.register-container, .login-container section {
+    display: flex;
+}
+
+.login-form {
+    border: 1px solid #2B3553;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 20px;
+}
+
+.bg-login-image {
+    background-image: url('../images/identity_login.jpg');
+}
+
+.bg-register-image {
+    background-image: url('../images/identity_register.jpg');
+}
+
+.bg-login-image, .bg-register-image {
+    background-position: center;
+    background-size: cover;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    padding: 20px;
+    border: 1px solid #2B3553;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/*user profile styles start*/
+
+.user-row {
+    justify-content: center;
+}
+
+.user-content {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.user-row .nav-pills .nav-link.active {
+    background-color: #e14eca;
+}
+
+.user-row .nav-pills .nav-link {
+    color: white;
+}
+
+.user-row .card {
+    margin-bottom: 0;
+}
+
+.user-gradient {
+    background-image: linear-gradient(to right, #E04ECB, #75B8E4);
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
+}
+
+/*user profile styles end*/
+
+/*media queries start*/
+@media only screen and (max-width: 600px) {
+    .bg-login-image, .bg-register-image {
+        display: none;
+    }
+
+    .login-form {
+        border-radius: 10px;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    .bg-login-image, .bg-register-image {
+        max-width: 30%;
+    }
+
+    .login-form {
+        min-width: 70%;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .bg-login-image, .bg-register-image {
+        max-width: 50%;
+    }
+
+    .login-form {
+        min-width: 50%;
+    }
+}
+
+@media only screen and (max-width: 1430px) {
+    #slider-range-rank {
+        max-width: 40%;
+    }
+
+    #rank-max-span {
+        min-width: 30%;
+    }
+
+    #rank-min-span {
+        min-width: 20%;
+    }
+}
+
+@media only screen and (max-width: 1450px) {
+    #create-form-location-section {
+        display: block;
+    }
+    #create-form-image-upload {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .flex-field {
+        display: inline;
+    }
+
+    .flex-field-inner {
+        justify-content: left;
+        min-width: 80%;
+        padding-left: 10px;
+    }
+
+    #duration-min-span, #duration-max-span {
+        width: 10%;
+    }
+
+    .filter-btns {
+        padding-left: 10px;
+    }
+}
+/*media queries end*/
+
+/*scroll page start*/
+
+/* Style the header: fixed position (always stay at the top) */
+.scroll-header {
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    width: 90%;
+    background-color: #f1f1f1;
+}
+
+/* The progress container (grey background) */
+.scroll-container {
+    width: 100%;
+    height: 7px;
+    background: #ccc;
+}
+
+/* The progress bar (scroll indicator) */
+.scroll-bar {
+    height: 7px;
+    background: #4caf50;
+    width: 0%;
+}
+
+/*scroll page end*/

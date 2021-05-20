@@ -1,48 +1,227 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<TSound.Data.Models.User> SignInManager
+@inject UserManager<TSound.Data.Models.User> UserManager
+@inject TSound.Services.Contracts.IUserService userService
+
+@{
+    var userCurrent = await userService.GetUserByEmailAsync(User.Identity.Name);
+
+    string title = string.Empty;
+    string url = Context.Request.Path;
+
+    if (url != null && url != "/")
+    {
+        string[] urlSections = Context.Request.Path.ToString().Split('/').ToArray();
+        title = (urlSections != null && urlSections.Length > 0) ? string.Join(" / ", urlSections.Skip(1).Take(2)) : "Home";
+    }
+    else
+    {
+        title = "Home";
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TSound.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/jquery/dist/jquery-ui.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" type="image/x-icon" href="~/images/favicon.ico">
+    <script src="https://kit.fontawesome.com/13d3a4aa9f.js" crossorigin="anonymous"></script>
+    <script src="https://google.com/recaptcha/api.js"></script>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TSound.Web</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <partial name="_LoginPartial" />
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<body class="">
+    <div class="wrapper">
+        <div class="wrapper">
+            <div class="sidebar">
+                <!--Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red"-->
+                <div class="sidebar-wrapper ps">
+                    <br />
+                    <div class="text-center">
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="simple-text logo-normal"><img src="~/images/logo_longer_white.png" alt="logo" class="img-logo-rect" /></a>
+                    </div>
+                    <ul class="nav">
+                        <li class="@(title.ToLowerInvariant() == "playlists / create" ? "active" : "")" style="background-color: #54036D;">
+                            <a href="@Url.Action("Create", "Playlists")">
+                                <i class="tim-icons icon-headphones"></i>
+                                <p class=""><b>Create Playlist!</b></p>
+                            </a>
                         </li>
                     </ul>
+                    <ul class="nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="@(title.ToLowerInvariant() == "playlists / myplaylists" ? "active" : "")">
+                                <a href="@Url.Action("MyPlaylists", "Playlists", new { email = User.Identity.Name })">
+                                    <i class="tim-icons icon-headphones"></i>
+                                    <p class=""><b>My Playlists</b></p>
+                                </a>
+                            </li>
+                        }
+                        <li class="@(title.ToLowerInvariant() == "playlists / all" ? "active" : "")">
+                            <a asp-area="" asp-controller="Playlists" asp-action="All">
+                                <i class="tim-icons icon-headphones"></i>
+                                <p>Playlists</p>
+                            </a>
+                        </li>
+                        <li class="@(title.ToLowerInvariant() == "users / all" ? "active" : "")">
+                            <a asp-area="" asp-controller="Users" asp-action="All">
+                                <i class="tim-icons icon-single-02"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
+                        <li class="@(title.ToLowerInvariant() == "genres / all" ? "active" : "")">
+                            <a asp-area="" asp-controller="Genres" asp-action="All">
+                                <i class="tim-icons icon-atom"></i>
+                                <p>Genres</p>
+                            </a>
+                        </li>
+                        <li class="@(title.ToLowerInvariant() == "apiservices / general" ? "active" : "")">
+                            <a asp-area="" asp-controller="ApiServices" asp-action="General">
+                                <i class="tim-icons icon-world"></i>
+                                <p>API Services</p>
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="@(title.ToLowerInvariant() == "admins / welcome" ? "active" : "")">
+                                <a asp-area="" asp-controller="Admins" asp-action="Welcome">
+                                    <i class="tim-icons icon-puzzle-10"></i>
+                                    <p>Admin Page</p>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 520px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+            <div class="main-panel">
+                <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
+                    <div class="container-fluid">
+                        <div class="navbar-wrapper">
+                            <div class="navbar-toggle d-inline">
+                                <button type="button" class="navbar-toggler">
+                                    <span class="navbar-toggler-bar bar1"></span>
+                                    <span class="navbar-toggler-bar bar2"></span>
+                                    <span class="navbar-toggler-bar bar3"></span>
+                                </button>
+                            </div>
+                            <a class="navbar-brand" href="javascript:void(0)">@title</a>
+                        </div>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-bar navbar-kebab"></span>
+                            <span class="navbar-toggler-bar navbar-kebab"></span>
+                            <span class="navbar-toggler-bar navbar-kebab"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navigation">
+                            <ul class="navbar-nav ml-auto">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    @*<li class="dropdown nav-item">
+                                            <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                                                <div class="notification d-none d-lg-block d-xl-block"></div>
+                                                <i class="tim-icons icon-sound-wave"></i>
+                                                <p class="d-lg-none">
+                                                    Notifications
+                                                </p>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right dropdown-navbar">
+                                                <li class="nav-link"><a href="#" class="nav-item dropdown-item">Mike John responded to your email</a></li>
+                                                <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">You have 5 more tasks</a></li>
+                                                <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Your friend Michael is in town</a></li>
+                                                <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another notification</a></li>
+                                                <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another one</a></li>
+                                            </ul>
+                                        </li>*@
+                                    <li class="dropdown nav-item">
+                                        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                                            <div class="photo">
+                                                <img src="@userCurrent.Image" height="30" id="img-circle" />
+                                            </div>
+                                            <b class="caret d-none d-lg-block d-xl-block"></b>
+                                            <p class="d-lg-none">
+                                                Log out
+                                            </p>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-navbar">
+                                            <li class="nav-link">
+                                                <p class="nav-item dropdown-item text-primary">Welcome back, @userCurrent.FirstName!</p>
+                                            </li>
+                                            <li class="dropdown-divider"></li>
+                                            <li class="nav-link">
+                                                <a href="@Url.Action("MyPlaylists", "Playlists", new { email = User.Identity.Name })" class="nav-item dropdown-item">My Playlists</a>
+                                            </li>
+                                            <li class="nav-link">
+                                                <a class="nav-item dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile</a>
+                                            </li>
+                                            <li class="nav-link">
+                                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                                    <button type="submit" class="nav-item dropdown-item">Logout</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="separator d-lg-none"></li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                <div class="content">
+                    <main role="main" class="pb-3">
+                        @RenderBody()
+                    </main>
+                </div>
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="nav-link">
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">
+                                    About us
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="copyright">
+                            <a href="/Home/EmailSend" target="_blank" class="text-white"><i class="far fa-envelope fa-2x button-hover"></i></a> &nbsp;
+                            <a href="https://www.instagram.com/" target="_blank" class="text-white"><i class="fab fa-instagram fa-2x button-hover"></i></a> &nbsp;
+                            <a href="https://www.facebook.com/" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x button-hover"></i></a>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2021 - TSound.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&language=en&key=AIzaSyDhW6Lx8XoW6IqF4r6N8_5LF_CHt8PmyKI"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/template/black-dashboard.js"></script>
+    <script src="~/js/template/black-dashboard.min.js"></script>
+    <script src="~/js/template/core/bootstrap.min.js"></script>
+    <script src="~/js/template/core/popper.min.js"></script>
+    <script src="~/js/template/plugins/bootstrap-notify.js"></script>
+    <script src="~/js/template/plugins/chartjs.min.js"></script>
+    <script src="~/js/template/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <script src="~/js/googleMapScript.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
