@@ -206,19 +206,22 @@ namespace TSound.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("DeezerId")
-                        .IsRequired()
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PictureURL")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("SongCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("SpotifyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -253,6 +256,9 @@ namespace TSound.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SpotifyId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")

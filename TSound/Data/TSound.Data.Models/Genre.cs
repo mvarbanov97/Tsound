@@ -13,14 +13,16 @@ namespace TSound.Data.Models
 
         [Required]
         [JsonProperty("id")]
-        public string DeezerId { get; set; }
+        public string SpotifyId { get; set; }
 
         [Required]
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("picture")]
-        public string PictureURL { get; set; }
+        [JsonProperty("href")]
+        public string Link { get; set; }
+
+        public string ImageUrl { get; set; }
 
         public int SongCount { get; set; }
 

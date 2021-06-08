@@ -1,12 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Extensions\RestHttpClient.cs~RF503605f6.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.14.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\TSound.Data\TSound.Data.csproj" />
+    <ProjectReference Include="..\TSound.Services.Models\TSound.Services.Models.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,58 +3,43 @@
 @{ ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml"; }
 
-<body onload="initialize();">
+<body onload="initialize()">
     <h1>Create</h1>
 
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8 border border-primary" id="div-chamfered-bordered-thick">
-            <div id="map"></div>
-            <form id="distance_form">
+            <form asp-controller="Playlists" asp-action="Create" method="post" class="form" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="text-danger"></div> <!--UL list -->
+
+                <div id="map" style="padding-top:10px"></div>
                 <label>Origin: </label>
-                <div class="input-group mb-3">
+                <div class="input-group">
                     <input id="from_places" class="form-control" placeholder="Enter the starting point" />
                     <input id="latlng" type="hidden" name="origin" required />
                     <div class="input-group-append">
-                        <button id="current_location_button" type="button">Select Current Location</button>
+                        <button id="current_location_button" class="btn btn-secondary" type="button">Select Current Location</button>
                     </div>
                 </div>
 
                 <label>Destination: </label>
-                <div class="input-group mb-3">
+                <div class="from-group">
                     <input id="to_places" class="form-control" placeholder="Enter the end point" />
                     <input id="latlng2" type="hidden" name="destination" required />
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button">Select Current Location</button>
-                    </div>
                 </div>
 
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Distance is Kilo :
-                    <span id="in_kilo" class="badge badge-primary batge-pill"></span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    IN TEXT :
-                    <span id="duration_text" class="badge badge-primary batge-pill"></span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    IN MINUTES :
-                    <span id="duration_value" class="badge badge-primary batge-pill"></span>
-                </li>
+                <div class="row">
+                    <div class="col-6">
+                        Distance :
+                        <span id="in_kilo" class="badge badge-primary"></span>
+                    </div>
+                    <div class="col-6">
+                        Duration :
+                        <span id="duration_text" class="badge badge-primary batge-pill"></span>
+                    </div>
+                    <input type="hidden" asp-for="DurationMS" id="duration_MS" class="badge badge-primary batge-pill">  @*MS needed in oreder to generate playlist*@
 
-                <input type="submit" value="Calculate" onclick="calculateDistance()" class="btn btn-primary" />
-            </form>
-
-            <form asp-controller="Playlists" asp-action="Create" method="post" class="form" enctype="multipart/form-data">
-
-                <div asp-validation-summary="All" class="text-danger"></div> <!--UL list -->
-
-                <hr />
-                <p><b>Travel information:</b></p>
-
-
-                <br />
-                <button type="button" id="buttonLocation" onclick="getLocation()" class="text-center btn btn-sm btn-outline-primary">Share Location</button>
+                </div>
 
                 <hr />
                 <p><b>Preferences:</b></p>
@@ -71,55 +56,35 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
+                <div class="row">
+                    @for (int i = 0; i < Model.Genres.Count(); i++)
+                    {
+                    <div class="col-4">
+                        <input type="checkbox" asp-for="@Model.Genres[i].IsSelected" />
+                        <label asp-for="@Model.Genres[i].IsSelected">@Model.Genres[i].Name</label>
+                        <input type="hidden" asp-for="@Model.Genres[i].Id" />
+                        <input type="hidden" asp-for="@Model.Genres[i].SpotifyId" />
+                        <input type="hidden" asp-for="@Model.Genres[i].Name" />
+                    </div>}
+                </div>
+
+                <br />
+
                 <div>
                     <hr />
                     <label>Attach Image</label><br />
-                    <input type="file" name="ImageFile" />
+                    <input class="btn btn-secondary" type="file" />
                     <hr />
                 </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                    <label asp-for="IsTopTracksOptionUsed" class="form-check-label">Use top tracks</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked="checked">
-                    <label asp-for="IsTracksFromSameArtistAllowed" class="form-check-label active">Allow tracks from the same artist</label>
-                </div>
+                <input type="submit" value="Submit" class="btn btn-outline-primary" />
+                <br />
+                <br />
+                <br />
                 <br />
 
-                <input type="submit" value="Submit" class="btn btn-outline-primary" />
-                <br /><br />
             </form>
         </div>
         <div class="col-md-2"></div>
     </div>
-
-
 </body>
-
-<script>
-    function getLocation() {
-        document.getElementById('buttonLocation').style.visibility = "hidden";
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(getCoordinates);
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-            console.log(latitude);
-            console.log(longitude);
-        }
-        else {
-            x.innerHTML = "Geolocation is not supported by this browser.";
-        }
-    }
-
-    function getCoordinates(position) {
-        var latitude = position.coords.latitude;
-        var longitude = position.coords.longitude;
-        console.log(latitude);
-        console.log(longitude);
-    }
-</script>
-

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
-using TSound.Data.UnitOfWork;
 using TSound.Services;
+using TSound.Services.External.SpotifyAuthorization;
 
 namespace TSound.Data.Seeder.Seeding
 {
@@ -13,11 +13,14 @@ namespace TSound.Data.Seeder.Seeding
         private GenreService genreService;
         private UnitOfWork.UnitOfWork unitOfWork;
         private IMapper mapper;
+        private HttpClient http;
+        private IConfiguration configuration;
+        private AccountsService accountsService;
 
         public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
             this.unitOfWork = new UnitOfWork.UnitOfWork(dbContext);
-            this.genreService = new GenreService(this.unitOfWork, this.mapper);
+            this.genreService = new GenreService(this.unitOfWork, this.mapper, this.http, this.configuration, this.accountsService);
             await this.genreService.LoadGenresInDbAsync();
         }
     }

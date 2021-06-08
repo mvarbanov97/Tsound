@@ -472,3 +472,12 @@ body {
 }
 
 /*scroll page end*/
+
+#map {
+    margin: 0;
+    padding: 0;
+    margin: 10px;
+    height: 400px;
+    align-self: center;
+    border-radius: 25px;
+}

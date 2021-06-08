@@ -1,19 +1,25 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TSound.Data.Models;
+using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Data.UnitOfWork;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
+using TSound.Services.External.Helpers;
+using TSound.Services.External.SpotifyAuthorization;
 using TSound.Services.Models;
 using TSound.Services.Validators;
+using static TSound.Data.Models.SpotifyDomainModels.SpotifyPlaylistModel;
 
 namespace TSound.Services
 {
@@ -22,16 +28,24 @@ namespace TSound.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly ServiceValidator validator;
         private readonly IDateTimeProvider dateTimeProvider;
+        private readonly IAccountsService accountsService;
+        private readonly IUserService userService;
         private readonly IMapper mapper;
+        private readonly HttpClient http;
 
         public PlaylistService(
             IUnitOfWork unitOfWork,
             IDateTimeProvider dateTimeProvider,
-            IMapper mapper)
+            IMapper mapper,
+            HttpClient http,
+            IAccountsService accountsService, IUserService userService)
         {
             this.unitOfWork = unitOfWork;
             this.dateTimeProvider = dateTimeProvider;
             this.mapper = mapper;
+            this.http = http;
+            this.accountsService = accountsService;
+            this.userService = userService;
         }
 
         /// <summary>
@@ -41,10 +55,9 @@ namespace TSound.Services
         /// <returns>A task that represents a PlaylistServiceModel that holds all information on the newly created user, including the new Guid id.</returns>
         public async Task<PlaylistServiceModel> CreatePlaylistAsync(PlaylistServiceModel playlistServiceModel)
         {
-            this.validator.ValidateIfNameIsNullOrEmpty(playlistServiceModel.Name);
-            this.validator.ValidateIfAuthorExistsInDb(playlistServiceModel.UserId);
-            this.validator.ValidateIfAuthorIsDeleted(playlistServiceModel.UserId);
-
+            //this.validator.ValidateIfNameIsNullOrEmpty(playlistServiceModel.Name);
+            //this.validator.ValidateIfAuthorExistsInDb(playlistServiceModel.UserId);
+            //this.validator.ValidateIfAuthorIsDeleted(playlistServiceModel.UserId);
 
             playlistServiceModel.DateCreated = dateTimeProvider.GetDateTime();
             playlistServiceModel.DateModified = dateTimeProvider.GetDateTime();
@@ -57,6 +70,7 @@ namespace TSound.Services
             var playlistJustCreated = this.unitOfWork.Playlists.All().First(x => x.Name == playlistServiceModel.Name);
 
             playlistServiceModel.Id = playlistJustCreated.Id;
+            playlistServiceModel.SpotifyId = playlistJustCreated.SpotifyId;
             playlistServiceModel.DateCreated = playlistJustCreated.DateCreated;
             playlistServiceModel.DateModified = playlistJustCreated.DateModified;
             playlistServiceModel.IsDeleted = playlistJustCreated.IsDeleted;
@@ -125,26 +139,6 @@ namespace TSound.Services
             return result;
         }
 
-        public async Task<int> GetDurationTravelAsync(string queryFirst, string querySecond)
-        {
-            this.validator.ValidateIfNameIsNullOrEmpty(queryFirst);
-            this.validator.ValidateIfNameIsNullOrEmpty(querySecond);
-
-            List<double> coordinatesFirstPoint = await this.GetLocationByQueryAsync(queryFirst);
-            List<double> coordinatesSecondPoint = await this.GetLocationByQueryAsync(querySecond);
-
-            if (coordinatesFirstPoint == null || coordinatesSecondPoint == null)
-            {
-                throw new ArgumentException("You did not get coordinates.");
-            }
-
-            int duration = await GetDurationByCoordinatesAsync(coordinatesFirstPoint, coordinatesSecondPoint) * 60 /*seconds*/;
-
-            this.validator.ValidateDurationTravel(duration);
-
-            return duration;
-        }
-
         public async Task<PlaylistServiceModel> GetPlaylistByIdAsync(Guid playlistId, bool isApiKeyRequired = false, Guid? userApiKey = null)
         {
             if (isApiKeyRequired)
@@ -191,91 +185,44 @@ namespace TSound.Services
             }
         }
 
-        public async Task<bool> GeneratePlaylistAsync(Guid playlistId, int durationTravel, IEnumerable<Guid> genresIdsToUse, bool IsTopTracksOptionEnabled, bool IsTracksFromSameArtistEnabled)
+        public async Task<string[]> GeneratePlaylistAsync(Guid playlistId, int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken)
         {
-            this.validator.ValidatePlaylistId(playlistId);
-            this.validator.ValidateDurationTravel(durationTravel);
+            this.ValidatePlaylistId(playlistId);
+            this.ValidateDurationTravel(durationTravel);
 
             Random random = new Random();
-            HashSet<Guid> listArtistsIdsAlreadyUsed = new HashSet<Guid>();
-
             int durationDubbedCurrent = 0;
+            var trackUrisToAdd = new string[100];
 
             // If for some reason we don't receive any Genres by the User - use all available Genres.
-            if (genresIdsToUse == null || genresIdsToUse.Count() == 0)
+            if (categoryIdsToUse == null || categoryIdsToUse.Count() == 0)
             {
-                genresIdsToUse = this.unitOfWork.Genres.All().Select(x => x.Id);
+                categoryIdsToUse = this.unitOfWork.Genres.All().Select(x => x.SpotifyId);
             }
 
             while (true)
             {
-                // If Duration Travel - 5 min <= Duration Playlist Current < Duration Travel + 5 min => break.
-                if (durationDubbedCurrent >= durationTravel - (5 * 60) && durationDubbedCurrent <= durationTravel + (5 * 60))
+
+                if (durationTravel <= durationDubbedCurrent)
                 {
                     break;
                 }
 
-                Guid randomGenreId = genresIdsToUse.Skip(random.Next(0, genresIdsToUse.Count())).First();
+                string randomCategoryId = categoryIdsToUse.Skip(random.Next(0, categoryIdsToUse.Count())).First();
 
-                IEnumerable<Guid> collectionSongsIdsOfThisGenre = new List<Guid>();
+                var randomPlaylist = await this.GetCategoryPlaylists<PagedPlaylists>(randomCategoryId, "BG", 1, random.Next(1, 20), userAccessToken);
 
-                // Take all songs from the random Genre and if "Is Top Tracks Option Enabled" => take only those of Rank 100.000.
-                if (IsTopTracksOptionEnabled)
+                var randomTracksOfPlaylist = await this.GetPlaylistTracks<PlaylistPaged>(randomPlaylist.Items[0].Id, userAccessToken, null, random.Next(1, 3), random.Next(1, 20));
+
+                for (int i = 0; i < randomTracksOfPlaylist.Items.Count(); i++)
                 {
-                    collectionSongsIdsOfThisGenre = this.unitOfWork.Songs.All().Where(x => x.GenreId == randomGenreId).Where(x => x.Rank <= 500000).Select(x => x.Id);
-                }
-                else
-                {
-                    collectionSongsIdsOfThisGenre = this.unitOfWork.Songs.All().Where(x => x.GenreId == randomGenreId).Select(x => x.Id);
-                }
-
-                // Take a random Song Id - skipping a random count of songs.
-                Guid randomSongId = collectionSongsIdsOfThisGenre.Skip(random.Next(0, collectionSongsIdsOfThisGenre.Count())).First();
-                Song randomSong = this.unitOfWork.Songs.All().First(x => x.Id == randomSongId);
-
-                // If "Is Tracks From Same Artist Enabled" and the current list of "used" Artists contains the author of the randomly chosen Song => continue.
-                if (IsTracksFromSameArtistEnabled && listArtistsIdsAlreadyUsed.Any(x => x == randomSong.ArtistId))
-                {
-                    continue;
-                }
-
-                // If the random Genre does not exist in the Playlist<>Genre table => Add it.
-                if (!this.unitOfWork.PlaylistsGenres.All().Where(x => x.PlaylistId == playlistId).Any(b => b.GenreId == randomGenreId))
-                {
-                    await this.unitOfWork.PlaylistsGenres.AddAsync(new PlaylistGenre
-                    {
-                        PlaylistId = playlistId,
-                        GenreId = randomGenreId,
-                    });
-                    await unitOfWork.CompleteAsync();
-                }
-
-                // If the random Song does not exist in the Playlist<>Song table => Add it.
-                if (!this.unitOfWork.PlaylistsSongs.All().Where(x => x.PlaylistId == playlistId).Any(b => b.SongId == randomSongId))
-                {
-                    await this.unitOfWork.PlaylistsSongs.AddAsync(new PlaylistSong
-                    {
-                        PlaylistId = playlistId,
-                        SongId = randomSongId,
-                    });
-                    await this.unitOfWork.CompleteAsync();
-
-                    durationDubbedCurrent += randomSong.Duration;
-                    listArtistsIdsAlreadyUsed.Add(randomSong.ArtistId);
+                    trackUrisToAdd[i] = randomTracksOfPlaylist.Items[i].Track.Uri;
+                    durationDubbedCurrent += randomTracksOfPlaylist.Items[i].Track.DurationMs;
                 }
             }
-
-            Playlist playlistToEdit = await this.unitOfWork.Playlists.All().FirstAsync(x => x.Id == playlistId);
-
-            // If the playlist does not have any Description => add a "default" one.
-            if (playlistToEdit.Description == null)
-            {
-                int countSongsInPlaylist = this.unitOfWork.PlaylistsSongs.All().Where(x => x.PlaylistId == playlistId).Count();
-                playlistToEdit.Description = $"'{playlistToEdit.Name}' consists of {countSongsInPlaylist} songs that will make your journey from point A to point B sound like {playlistToEdit.DurationTravel / 60} minutes in Heaven...";
-                await this.unitOfWork.CompleteAsync();
-            }
-
-            return true;
+            
+            // Remove any emty values in the array, so the POST request to Spotify Playlist Api do not fail
+            return trackUrisToAdd.Where(x => !string.IsNullOrEmpty(x)).ToArray();
         }
 
         public async Task<bool> UpdatePlaylistDurationTravelAsync(Guid id, int durationTravel)
@@ -292,65 +239,169 @@ namespace TSound.Services
             return true;
         }
 
-        private async Task<string> GatherDataAsync(string url)
+        public async Task<T> GetCategoryPlaylists<T>(
+            string categoryId,
+            string country = null,
+            int? limit = null,
+            int offset = 0,
+            string accessToken = null)
         {
-            string result = string.Empty;
+            var baseUrl = $"https://api.spotify.com/v1/browse/categories/{categoryId}/playlists";
 
-            var client = new HttpClient();
+            var builder = new UriBuilder($"{baseUrl}");
+            builder.AppendToQueryIfValueNotNullOrWhiteSpace("country", country);
+            builder.AppendToQueryIfValueGreaterThan0("limit", limit);
+            builder.AppendToQueryIfValueGreaterThan0("offset", limit);
 
-            for (int i = 0; i < 10; i++)
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
+
+            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
+
+            var response = await this.http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
             {
-                try
-                {
-                    var response = await client.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-                    result = await response.Content.ReadAsStringAsync();
-                    break;
-                }
-                catch (Exception)
-                {
-                    Thread.Sleep(500);
-                }
+                var result = await response.Content.ReadAsStringAsync();
+                JObject deserialized = JsonConvert.DeserializeObject(result) as JObject;
+                var playlists = deserialized["playlists"].ToObject<T>();
+
+                return playlists;
             }
 
-            return result;
+            return default(T);
         }
 
-        private async Task<List<double>> GetLocationByQueryAsync(string query)
+        public async Task<T> GetPlaylistTracks<T>(
+            string playlistId,
+            string accessToken = null,
+            string fields = null,
+            int? limit = null,
+            int offset = 0,
+            string market = null,
+            string[] additionalTypes = null)
         {
-            string apiKey = $"Ah23AFfxih6bgoSaVF8nmoI_GVIKvpR4Fah58v4rMWAC7aZeOGkjIqANdSR1LT-q";
-            string queryFixed = query.Trim().Replace(" ", "%20").ToString();
+            if (string.IsNullOrEmpty(playlistId)) throw new ArgumentNullException(nameof(playlistId));
 
-            string url = $"http://dev.virtualearth.net/REST/v1/Locations/{queryFixed}?o=json&key={apiKey}";
+            var builder = new UriBuilder($"https://api.spotify.com/v1/playlists/{playlistId}/tracks");
+            builder.AppendToQueryIfValueNotNullOrWhiteSpace("fields", fields);
+            builder.AppendToQueryIfValueGreaterThan0("limit", limit);
+            builder.AppendToQueryIfValueGreaterThan0("offset", offset);
+            builder.AppendToQueryIfValueNotNullOrWhiteSpace("market", market);
+            builder.AppendToQueryAsCsv("additional_types", additionalTypes);
 
-            string result = await GatherDataAsync(url);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
+            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
 
-            if (!string.IsNullOrEmpty(result))
+            var response = await this.http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
             {
-                //LocationRoot rootLocation = JsonConvert.DeserializeObject<LocationRoot>(result);
-                //LocationPoint locationPoint = rootLocation.resourceSets.SelectMany(x => x.resources.Select(x => x.point)).FirstOrDefault();
-                //if (locationPoint != null && locationPoint.coordinates != null)
-                //{
-                //    return locationPoint.coordinates;
-                //}
+                var result = await response.Content.ReadAsStringAsync();
+                var playlistTracks = JsonConvert.DeserializeObject<T>(result);
+
+                return playlistTracks;
             }
-            return null;
+
+            return default(T);
         }
 
-        private async Task<int> GetDurationByCoordinatesAsync(List<double> coordinatesFirstPoint, List<double> coordinatesSecondPoint)
+        private void ValidateIfUserWithThisApiKeyIsTheAuthorOfPlaylist(Guid playlistId, User user)
         {
-            string apiKey = $"Ah23AFfxih6bgoSaVF8nmoI_GVIKvpR4Fah58v4rMWAC7aZeOGkjIqANdSR1LT-q";
-            string url = $"https://dev.virtualearth.net/REST/v1/Routes/DistanceMatrix?origins={coordinatesFirstPoint[0]},{coordinatesFirstPoint[1]}&destinations={coordinatesSecondPoint[0]},{coordinatesSecondPoint[1]}&travelMode=driving&key={apiKey}";
+            ValidatePlaylistId(playlistId);
 
-            string result = await this.GatherDataAsync(url);
+            var playlist = this.unitOfWork.Playlists.All().FirstOrDefault(x => x.Id == playlistId);
 
-            if (!string.IsNullOrEmpty(result))
+            if (playlist.UserId != user.Id)
             {
-                //DistanceRoot rootLocation = JsonConvert.DeserializeObject<DistanceRoot>(result);
-                //int duration = Convert.ToInt32(Math.Round(rootLocation.resourceSets.SelectMany(x => x.resources.SelectMany(x => x.results.Select(x => x.travelDuration))).First()));
-                //return duration;
+                throw new InvalidOperationException("The current User is not the author of the Playlist so no operations with it are allowed.");
             }
-            return -1;
         }
+
+        private void ValidatePlaylistId(Guid id)
+        {
+            if (!this.unitOfWork.Playlists.All().Any(x => x.Id == id))
+            {
+                throw new ArgumentException("A Playlist with such Id does not exist in the database.");
+            }
+        }
+
+        private void ValidateDurationTravel(int durationTravel)
+        {
+            if (durationTravel < 10 /*minutes*/ * 60 /*seconds*/)
+            {
+                throw new ArgumentException("The duration of your travel cannot be less than 10 minutes.");
+            }
+        }
+
+        //protected internal virtual async Task<T> GetModelFromProperty<T>(
+        //    Uri uri,
+        //    string rootPropertyName,
+        //    string accessToken = null)
+        //{
+        //    var jObject = await GetJObject(uri, accessToken: accessToken);
+        //    if (jObject == null) return default;
+        //    return jObject[rootPropertyName].ToObject<T>();
+        //}
+
+        //protected internal virtual async Task<JObject> GetJObject(Uri uri, string accessToken = null)
+        //{
+        //    string json = await this.http.Get
+        //    (
+        //        uri,
+        //        new AuthenticationHeaderValue("Bearer", accessToken ?? (await this.accountsService.GetAccessToken()))
+        //    );
+
+        //    // Todo #25 return 204 no content result 
+        //    if (string.IsNullOrEmpty(json)) return null;
+
+        //    JObject deserialized = JsonConvert.DeserializeObject(json) as JObject;
+        //    if (deserialized == null)
+        //        throw new InvalidOperationException($"Failed to deserialize response as JSON. Response = {json.Substring(0, Math.Min(json.Length, 256))}");
+
+        //    return deserialized;
+        //}
+
+
+        //public async Task<T> CreateSpotifyPlaylist<T>(
+        //    string userId,
+        //    PlaylistDetails details,
+        //    string accessToken = null)
+        //{
+        //    if (string.IsNullOrWhiteSpace(userId)) throw new
+        //            ArgumentException("A valid Spotify user id must be specified.");
+
+        //    if (details == null || string.IsNullOrWhiteSpace(details.Name)) throw new
+        //            ArgumentException("A PlaylistDetails object param with new playlist name must be provided.");
+
+        //    this.http.DefaultRequestHeaders.Authorization =
+        //        new AuthenticationHeaderValue("Bearer", accessToken ?? (await this.accountsService.GetAccessToken()));
+
+        //    StringContent content = null;
+
+
+        //    content = new StringContent(JsonConvert.SerializeObject(details));
+        //    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+
+        //    HttpResponseMessage response = null;
+        //    var builder = new UriBuilder($"https://api.spotify.com/v1/playlists/{userId}/tracks");
+
+        //    response = await this.http.PostAsync(builder.Uri.ToString(), content);
+
+        //    var spotifyResponse = new SpotifyResponse<T>
+        //    {
+        //        StatusCode = response.StatusCode,
+        //        ReasonPhrase = response.ReasonPhrase
+        //    };
+
+        //    if (response.Content != null)
+        //    {
+        //        string json = await response.Content.ReadAsStringAsync();
+        //        if (!string.IsNullOrEmpty(json)) spotifyResponse.Data = JsonConvert.DeserializeObject<T>(json);
+        //    }
+
+        //    var userSpotifyId = await this.userService.GetUserSpotifyId(userId);
+        //    return default(T); 
+        //}
     }
 }

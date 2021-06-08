@@ -17,11 +17,32 @@ using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
 using TSound.Services;
 using TSound.Services.Contracts;
-using TSound.Services.Models.MappingConfiguration;
+using TSound.Web.MappingConfiguration;
 using TSound.Services.Providers;
+using TSound.Services.External.Spotify;
+using TSound.Data.Seeder.Seeding;
+using System.Web.Http;
+using TSound.Services.External;
+using System.Net.Http;
+using Microsoft.AspNetCore.Authentication;
+using TSound.Services.External.SpotifyAuthorization;
 
 namespace TSound.Web
 {
+    public static class ServiceProviderExtensions
+    {
+        public static IServiceCollection AddControllersAsServices(this IServiceCollection services,
+           IEnumerable<Type> controllerTypes)
+        {
+            foreach (var type in controllerTypes)
+            {
+                services.AddTransient(type);
+            }
+
+            return services;
+        }
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -65,6 +86,7 @@ namespace TSound.Web
             services.AddSingleton(cloudinary);
 
             // Register Logic Services
+            services.AddSingleton<HttpClient>(new HttpClient());
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             services.AddTransient<IPlaylistService, PlaylistService>();
             services.AddTransient<ISongService, SongService>();
@@ -72,7 +94,38 @@ namespace TSound.Web
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAlbumService, AlbumService>();
             services.AddTransient<IArtistService, ArtistService>();
+
+            services.AddScoped<ISpotifyAuthService, SpotifyAuthService>();
+            services.AddTransient<IUserAccountsService, UserAccountsService>();
+            services.AddTransient<IAccountsService, AccountsService>();
+
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            services.AddTransient<IApplicationCloudinary, ApplicationCloudinary>();
+
+            services.AddControllersAsServices(typeof(Startup).Assembly.GetExportedTypes()
+                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
+                .Where(t => typeof(ApiController).IsAssignableFrom(t)
+                    || t.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase)));
+
+            services.AddHttpClient();
+
+            services.AddAuthentication()
+                    .AddSpotify(spotifyOptions =>
+                    {
+                        spotifyOptions.ClientId = $"{this.Configuration["Spotify:ClientId"]}";
+                        spotifyOptions.ClientSecret = $"{this.Configuration["Spotify:ClientSecret"]}";
+                        spotifyOptions.CallbackPath = "/callback";
+                        spotifyOptions.UserInformationEndpoint = "https://api.spotify.com/v1/me";
+                        spotifyOptions.SaveTokens = true;
+                        spotifyOptions.Scope.Add("playlist-read-private playlist-modify-private user-read-email user-read-private");
+                        spotifyOptions.Events.OnRemoteFailure = (context) =>
+                         {
+                             // Handle failed login attempts here
+                             return Task.CompletedTask;
+                         };
+                        spotifyOptions.ClaimActions.MapJsonKey("urn:spotify:profilepicture", "profilepicture", "url");
+                    });
 
             services.AddAutoMapper(cfg => cfg.AddProfile<AutomapperProfile>());
 
@@ -83,6 +136,26 @@ namespace TSound.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Seed data on application startup
+            using (var serviceScope = app.ApplicationServices.CreateScope())
+            {
+                var dbContext = serviceScope.ServiceProvider.GetRequiredService<TSoundDbContext>();
+
+                if (env.IsDevelopment())
+                {
+                    dbContext.Database.Migrate();
+                }
+                else if (env.IsProduction())
+                {
+                    dbContext.Database.Migrate();
+                }
+
+                if (!dbContext.Users.Any())
+                {
+                    new TSoundDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

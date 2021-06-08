@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace TSound.Data.UnitOfWork
             this.Albums = new Repository<Album>(context);
             this.Artists = new Repository<Artist>(context);
             this.Users = new Repository<User>(context);
+            this.UserLogins = new Repository<IdentityUserLogin<Guid>>(context);
+            this.UserTokens = new Repository<IdentityUserToken<Guid>>(context);
             this.Playlists = new Repository<Playlist>(context);
             this.PlaylistsGenres = new Repository<PlaylistGenre>(context);
             this.PlaylistsSongs = new Repository<PlaylistSong>(context);
@@ -34,6 +37,10 @@ namespace TSound.Data.UnitOfWork
         public IRepository<Artist> Artists { get; private set; }
 
         public IRepository<User> Users { get; private set; }
+        
+        public IRepository<IdentityUserLogin<Guid>> UserLogins { get; private set; }
+
+        public IRepository<IdentityUserToken<Guid>> UserTokens { get; private set; }
 
         public IRepository<Playlist> Playlists { get; private set; }
 

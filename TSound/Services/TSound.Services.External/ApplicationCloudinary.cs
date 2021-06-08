@@ -7,9 +7,16 @@ using Microsoft.AspNetCore.Http;
 
 namespace TSound.Services.External
 {
-    public class ApplicationCloudinary
+    public class ApplicationCloudinary : IApplicationCloudinary
     {
-        public static async Task<string> UploadImage(Cloudinary cloudinary, IFormFile file, string fileName)
+        private readonly Cloudinary cloudinary;
+
+        public ApplicationCloudinary(Cloudinary cloudinary)
+        {
+            this.cloudinary = cloudinary;
+        }
+
+        public async Task<string> UploadImageAsync(IFormFile file, string fileName)
         {
             if (file == null)
                 return null;

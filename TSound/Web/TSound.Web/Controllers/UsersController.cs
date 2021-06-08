@@ -45,5 +45,12 @@ namespace TSound.Web.Controllers
             return this.View(model);
         }
 
+        public async Task<IActionResult> ById()
+        {
+            var currentUserId = this.userManager.GetUserId(this.User);
+            var user = await this.userService.GetUserSpotifyId(currentUserId);
+
+            return this.View();
+        }
     }
 }

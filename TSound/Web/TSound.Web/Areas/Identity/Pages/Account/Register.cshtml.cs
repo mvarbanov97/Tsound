@@ -28,20 +28,20 @@ namespace TSound.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> userManager;
         private readonly ILogger<RegisterModel> logger;
         private readonly IEmailSender emailSender;
-        private readonly Cloudinary cloudinary;
+        private readonly IApplicationCloudinary applicationCloudinary;
 
         public RegisterModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            Cloudinary cloudinary)
+            IApplicationCloudinary applicationCloudinary)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.logger = logger;
             this.emailSender = emailSender;
-            this.cloudinary = cloudinary;
+            this.applicationCloudinary = applicationCloudinary;
         }
 
         [BindProperty]
@@ -112,8 +112,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                     ImageUrl = GlobalConstants.NoAvatarImageLocation,
                 };
 
-                var profileImageUrl = await ApplicationCloudinary.UploadImage(
-                this.cloudinary,
+                var profileImageUrl = await this.applicationCloudinary.UploadImageAsync(
                 this.Input.ImageFile,
                 string.Format(GlobalConstants.CloudinaryUserProfilePictureName, user.UserName));
 

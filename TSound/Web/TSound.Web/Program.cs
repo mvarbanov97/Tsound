@@ -21,6 +21,7 @@ namespace TSound.Web
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .ConfigureAppConfiguration(configurationBuilder => { configurationBuilder.AddEnvironmentVariables(); });
     }
 }

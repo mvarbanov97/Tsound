@@ -17,11 +17,15 @@ namespace TSound.Web.MappingConfiguration
         public AutomapperProfile()
         {
             this.CreateMap<Playlist, PlaylistServiceModel>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
                 .ForMember(dest => dest.UserImage, opt => opt.MapFrom(src => src.User.ImageUrl))
                 .ForMember(dest => dest.DurationPlaylist, opt => opt.MapFrom(src => src.Songs.Sum(x => x.Song.Duration)))
                 .ForMember(dest => dest.Rank, opt => opt.MapFrom(src => (int)src.Songs.Select(playlistSong => playlistSong.Song).Average(song => song.Duration)))
                 .ReverseMap();
+
+            this.CreateMap<PlaylistServiceModel, Playlist>()
+                .ForMember(dest => dest.User, opt => opt.Ignore());
 
             this.CreateMap<Genre, GenreServiceModel>();
 
@@ -39,6 +43,7 @@ namespace TSound.Web.MappingConfiguration
             this.CreateMap<Artist, ArtistServiceModel>();
 
             this.CreateMap<GenreServiceModel, GenreViewModel>().ReverseMap();
+            this.CreateMap<GenreServiceModel, GenreFullViewModel>().ReverseMap();
 
             this.CreateMap<SongServiceModel, SongViewModel>().ReverseMap();
 
