@@ -7,23 +7,23 @@ using TSound.Data.Models;
 
 namespace TSound.Data.Configuration
 {
-    public class PlaylistGenreConfiguration : IEntityTypeConfiguration<PlaylistGenre>
+    public class PlaylistCategoryConfiguration : IEntityTypeConfiguration<PlaylistCategory>
     {
-        public void Configure(EntityTypeBuilder<PlaylistGenre> builder)
+        public void Configure(EntityTypeBuilder<PlaylistCategory> builder)
         {
             builder
-                .HasKey(playGenre => new { playGenre.PlaylistId, playGenre.GenreId });
+                .HasKey(playGenre => new { playGenre.PlaylistId, playGenre.CategoryId });
 
             builder
                 .HasOne(playGenre => playGenre.Playlist)
-                .WithMany(playlist => playlist.Genres)
+                .WithMany(playlist => playlist.Categories)
                 .HasForeignKey(playGenre => playGenre.PlaylistId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(playGenre => playGenre.Genre)
+                .HasOne(playGenre => playGenre.Category)
                 .WithMany(genre => genre.Playlists)
-                .HasForeignKey(playGenre => playGenre.GenreId)
+                .HasForeignKey(playGenre => playGenre.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
         }

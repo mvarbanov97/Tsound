@@ -7,14 +7,14 @@ using TSound.Data.Models;
 
 namespace TSound.Data.Configuration
 {
-    public class GenreConfiguration : IEntityTypeConfiguration<Genre>
+    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
-        public void Configure(EntityTypeBuilder<Genre> builder)
+        public void Configure(EntityTypeBuilder<Category> builder)
         {
             builder
-                .HasMany(g => g.Songs)
-                .WithOne(s => s.Genre)
-                .HasForeignKey(s => s.GenreId)
+                .HasMany(g => g.Tracks)
+                .WithOne(s => s.Category)
+                .HasForeignKey(s => s.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

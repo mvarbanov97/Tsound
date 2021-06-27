@@ -7,26 +7,26 @@ using TSound.Data.Models;
 
 namespace TSound.Data.Configuration
 {
-    public class SongConfiguration : IEntityTypeConfiguration<Song>
+    public class TrackConfiguration : IEntityTypeConfiguration<Track>
     {
-        public void Configure(EntityTypeBuilder<Song> builder)
+        public void Configure(EntityTypeBuilder<Track> builder)
         {
             builder
                 .HasOne(s => s.Album)
-                .WithMany(a => a.Songs)
+                .WithMany(a => a.Tracks)
                 .HasForeignKey(a => a.AlbumId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne(s => s.Artist)
-                .WithMany(a => a.Songs)
+                .WithMany(a => a.Tracks)
                 .HasForeignKey(a => a.ArtistId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(s => s.Genre)
-                .WithMany(g => g.Songs)
-                .HasForeignKey(s => s.GenreId)
+                .HasOne(s => s.Category)
+                .WithMany(g => g.Tracks)
+                .HasForeignKey(s => s.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

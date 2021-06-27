@@ -12,13 +12,7 @@ namespace TSound.Data.Configuration
         public void Configure(EntityTypeBuilder<Album> builder)
         {
             builder
-                .HasOne(a => a.Artist)
-                .WithMany(ar => ar.Albums)
-                .HasForeignKey(a => a.ArtistId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder
-                .HasMany(a => a.Songs)
+                .HasMany(a => a.Tracks)
                 .WithOne(s => s.Album)
                 .HasForeignKey(s => s.AlbumId)
                 .OnDelete(DeleteBehavior.Restrict);
