@@ -10,9 +10,9 @@ namespace TSound.Data.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<Genre> Genres { get; }
+        IRepository<Category> Categories { get; }
 
-        IRepository<Song> Songs { get; }
+        IRepository<Track> Tracks { get; }
 
         IRepository<Album> Albums { get; }
 
@@ -24,9 +24,9 @@ namespace TSound.Data.UnitOfWork
 
         IRepository<Playlist> Playlists { get; }
 
-        IRepository<PlaylistGenre> PlaylistsGenres { get; }
+        IRepository<PlaylistCategory> PlaylistCategories { get; }
 
-        IRepository<PlaylistSong> PlaylistsSongs { get; }
+        IRepository<PlaylistTrack> PlaylistTracks { get; }
 
         Task<int> CompleteAsync();
     }

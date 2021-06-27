@@ -16,21 +16,21 @@ namespace TSound.Data.UnitOfWork
         public UnitOfWork(TSoundDbContext context)
         {
             this.Context = context;
-            this.Genres = new Repository<Genre>(context);
-            this.Songs = new Repository<Song>(context);
+            this.Categories = new Repository<Category>(context);
+            this.Tracks = new Repository<Track>(context);
             this.Albums = new Repository<Album>(context);
             this.Artists = new Repository<Artist>(context);
             this.Users = new Repository<User>(context);
             this.UserLogins = new Repository<IdentityUserLogin<Guid>>(context);
             this.UserTokens = new Repository<IdentityUserToken<Guid>>(context);
             this.Playlists = new Repository<Playlist>(context);
-            this.PlaylistsGenres = new Repository<PlaylistGenre>(context);
-            this.PlaylistsSongs = new Repository<PlaylistSong>(context);
+            this.PlaylistCategories = new Repository<PlaylistCategory>(context);
+            this.PlaylistTracks = new Repository<PlaylistTrack>(context);
         }
 
-        public IRepository<Genre> Genres { get; private set; }
+        public IRepository<Category> Categories { get; private set; }
 
-        public IRepository<Song> Songs { get; private set; }
+        public IRepository<Track> Tracks { get; private set; }
 
         public IRepository<Album> Albums { get; private set; }
 
@@ -44,9 +44,9 @@ namespace TSound.Data.UnitOfWork
 
         public IRepository<Playlist> Playlists { get; private set; }
 
-        public IRepository<PlaylistGenre> PlaylistsGenres { get; private set; }
+        public IRepository<PlaylistCategory> PlaylistCategories { get; private set; }
 
-        public IRepository<PlaylistSong> PlaylistsSongs { get; private set; }
+        public IRepository<PlaylistTrack> PlaylistTracks { get; private set; }
 
         public async Task<int> CompleteAsync()
         {
