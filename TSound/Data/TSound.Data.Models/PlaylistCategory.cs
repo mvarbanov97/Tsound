@@ -4,14 +4,14 @@ using System.Text;
 
 namespace TSound.Data.Models
 {
-    public class PlaylistSong
+    public class PlaylistCategory
     {
         public Playlist Playlist { get; set; }
 
         public Guid PlaylistId { get; set; }
 
-        public Song Song { get; set; }
+        public Category Category { get; set; }
 
-        public Guid SongId { get; set; }
+        public Guid CategoryId { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using TSound.Data.Models.SpotifyDomainModels;
 
 namespace TSound.Data.Models
 {
@@ -12,28 +13,17 @@ namespace TSound.Data.Models
 
         [Required]
         [JsonProperty("id")]
-        public string DeezerId { get; set; }
+        public string SpotifyId { get; set; }
 
         [Required]
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [Required]
-        [JsonProperty("link")]
-        public string ArtistPageURL { get; set; }
+        [JsonProperty("external_urls")]
+        public ExternalUrls ExternalUrls { get; set; }
 
-        [JsonProperty("picture")]
-        public string PictureURL { get; set; }
-
-        [JsonProperty("nb_album")]
-        public int AlbumCount { get; set; }
-
-        [JsonProperty("nb_fan")]
-        public int FanCount { get; set; }
-
-        [Required]
-        [JsonProperty("tracklist")]
-        public string SongListURL { get; set; }
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
 
         public int? SongCount { get; set; }
 
@@ -41,9 +31,9 @@ namespace TSound.Data.Models
 
         public DateTime? BirthDate { get; set; }
 
-        public ICollection<Song> Songs { get; set; } = new HashSet<Song>();
+        public ICollection<Track> Tracks { get; set; } = new HashSet<Track>();
 
-        public ICollection<Album> Albums { get; set; } = new HashSet<Album>();
+        public ICollection<AlbumArtist> Albums { get; set; } = new HashSet<AlbumArtist>();
 
 
     }

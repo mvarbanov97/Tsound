@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,11 +9,20 @@ namespace TSound.Data.Models
     {
         public Guid Id { get; set; }
 
+        [JsonProperty("id")]
         public string SpotifyId { get; set; }
 
+        [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("collaborative")]
+        public bool Collaborative { get; set; }
+
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
 
         public DateTime DateCreated { get; set; }
 
@@ -29,8 +39,10 @@ namespace TSound.Data.Models
         public Guid UserId { get; set; }
         public User User { get; set; }
 
-        public ICollection<PlaylistSong> Songs { get; set; } = new HashSet<PlaylistSong>();
+        public int SongsCount { get; set; }
+
+        public ICollection<PlaylistTrack> Tracks { get; set; } = new HashSet<PlaylistTrack>();
         
-        public ICollection<PlaylistGenre> Genres { get; set; } = new HashSet<PlaylistGenre>();
+        public ICollection<PlaylistCategory> Categories { get; set; } = new HashSet<PlaylistCategory>();
     }
 }

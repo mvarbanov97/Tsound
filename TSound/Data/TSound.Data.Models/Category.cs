@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TSound.Data.Models
 {
-    public class Genre
+    public class Category
     {
         [Key]
         public Guid Id { get; set; }
@@ -26,8 +26,8 @@ namespace TSound.Data.Models
 
         public int SongCount { get; set; }
 
-        public ICollection<Song> Songs { get; set; } = new HashSet<Song>();
+        public ICollection<Track> Tracks { get; set; } = new HashSet<Track>();
 
-        public ICollection<PlaylistGenre> Playlists { get; set; } = new HashSet<PlaylistGenre>();
+        public ICollection<PlaylistCategory> Playlists { get; set; } = new HashSet<PlaylistCategory>();
     }
 }

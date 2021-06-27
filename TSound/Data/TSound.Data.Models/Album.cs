@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using TSound.Data.Models.SpotifyDomainModels;
 
 namespace TSound.Data.Models
 {
@@ -13,25 +14,32 @@ namespace TSound.Data.Models
 
         [Required]
         [JsonProperty("id")]
-        public string DeezerId { get; set; }
+        public string SpotifyId { get; set; }
+
+        [JsonProperty("album_type")]
+        public string AlbumType { get; set; }
 
         [Required]
-        [JsonProperty("title")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [Required]
-        [JsonProperty("tracklist")]
-        public string SonglistUrl { get; set; }
+        [JsonProperty("release_date")]
+        public string ReleaseDate { get; set; }
 
-        [Required]
-        [JsonProperty("artist")]
-        public Artist Artist { get; set; }
-        public Guid ArtistId { get; set; }
+        [JsonProperty("external_urls")]
+        public ExternalUrls ExternalUrls { get; set; }
+
+        [JsonProperty("total_tracks")]
+        public long TotalTracks { get; set; }
+
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
 
         [Required]
         [JsonProperty("tracks")]
-        public ICollection<Song> Songs { get; set; } = new HashSet<Song>();
+        public ICollection<Track> Tracks { get; set; } = new HashSet<Track>();
 
-        public int SongCount { get; set; }
+        [JsonProperty("artists")]
+        public ICollection<AlbumArtist> Artists { get; set; } = new HashSet<AlbumArtist>();
     }
 }
