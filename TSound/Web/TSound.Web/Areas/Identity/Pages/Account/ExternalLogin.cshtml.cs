@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using TSound.Data.Models;
+using TSound.Services.Contracts;
+using TSound.Services.External.SpotifyAuthorization;
 
 namespace TSound.Web.Areas.Identity.Pages.Account
 {
@@ -25,17 +27,20 @@ namespace TSound.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly IUserService _userService;
 
         public ExternalLoginModel(
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserService userService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
+            _userService = userService;
         }
 
         [BindProperty]
@@ -53,6 +58,10 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            [Required]
+            [DataType(DataType.Password)]
+            public string Password { get; set; }
         }
 
         public IActionResult OnGetAsync()
@@ -60,10 +69,15 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             return RedirectToPage("./Login");
         }
 
-        public IActionResult OnPost(string provider, string returnUrl = null)
+        public async Task<IActionResult> OnPost(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
+
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
@@ -77,6 +91,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
+
             await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
             if (info == null)
@@ -126,9 +141,13 @@ namespace TSound.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = Input.Email, Email = Input.Email };
+                var accessToken = info.AuthenticationTokens.First().Value;
+                var spotifyDetails = await _userService.GetSpotifyUser(info.ProviderKey, accessToken);
+                var fullName = spotifyDetails.DisplayName.Split(' ');
 
-                var result = await _userManager.CreateAsync(user);
+                var user = new User { UserName = Input.Email, Email = Input.Email, DateCreated = DateTime.UtcNow, ImageUrl = spotifyDetails.Images[0].Url, FirstName = fullName[0], LastName = fullName[1] };
+
+                var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
@@ -177,6 +196,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                         props.StoreTokens(info.AuthenticationTokens);
                         props.IsPersistent = true;
 
+                        await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
                         await _signInManager.SignInAsync(user, props);
 
                         return LocalRedirect(returnUrl);
