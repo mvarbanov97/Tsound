@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TSound.Common;
 using TSound.Data.Models;
 
 namespace TSound.Data.Seeder.Seeding
@@ -13,6 +15,9 @@ namespace TSound.Data.Seeder.Seeding
 
         public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
+            var userManager = serviceProvider
+                                .GetRequiredService<UserManager<User>>();
+
             var hasher = new PasswordHasher<User>();
 
             for (int i = 1; i <= 40; i++)
@@ -21,7 +26,7 @@ namespace TSound.Data.Seeder.Seeding
                 string image = gender == 0 ? $"/images/users/user_profile_man_{random.Next(0, 11)}.jpg" : $"/images/users/user_profile_woman_{random.Next(0, 11)}.jpg";
                 string firstName = GetRandomFirstName(gender);
                 string lastName = GetRandomLastName();
-                string password = firstName.First().ToString().ToUpper() + firstName.Substring(1).ToLowerInvariant().Replace(" ", "") + "@1";
+                string password = "Test@1";
                 string email = (firstName + lastName).ToLowerInvariant().Replace(" ", "") + "@email.com";
                 DateTime dateCreated = DateTime.UtcNow.AddYears(random.Next(-5, 1)).AddMonths(random.Next(-12, 0)).AddDays(random.Next(-31, 0));
 
@@ -31,7 +36,7 @@ namespace TSound.Data.Seeder.Seeding
                 }
                 else
                 {
-                    dbContext.Users.Add(new User
+                    var userToAdd = new User
                     {
                         DateCreated = dateCreated,
                         DateModified = dateCreated,
@@ -48,19 +53,11 @@ namespace TSound.Data.Seeder.Seeding
                         IsAdmin = false,
                         LockoutEnabled = true,
                         SecurityStamp = String.Concat(Array.ConvertAll(Guid.NewGuid().ToByteArray(), b => b.ToString("X2"))),
-                    });
-                    dbContext.SaveChanges();
+                    };
 
-                    User userCreated = dbContext.Users.FirstOrDefault(x => x.Email == email);
-                    userCreated.PasswordHash = hasher.HashPassword(userCreated, password);
-                    dbContext.SaveChanges();
+                    var result = await userManager.CreateAsync(userToAdd, password);
 
-                    dbContext.UserRoles.Add(new IdentityUserRole<Guid>
-                    {
-                        RoleId = dbContext.Roles.FirstOrDefault(x => x.Name == "User").Id,
-                        UserId = userCreated.Id,
-                    });
-                    dbContext.SaveChanges();
+                    await userManager.AddToRoleAsync(userToAdd, GlobalConstants.UserDefaultRoleName);
                 }
             }
         }

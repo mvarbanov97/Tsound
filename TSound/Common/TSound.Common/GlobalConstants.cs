@@ -6,6 +6,8 @@
 
         public const string AdministrationArea = "Administration";
 
+        public const string UserDefaultRoleName = "User";
+
         public const string CloudinaryUserProfilePictureName = "{0}_ProfilePicture";
 
         public const string CloudinaryPlaylistPictureName = "{0}_PlaylistPicture";

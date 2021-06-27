@@ -17,7 +17,7 @@ namespace TSound.Data.Seeder.Seeding
         {
             this.unitOfWork = new UnitOfWork.UnitOfWork(dbContext);
             this.songsService = new SongService(unitOfWork, mapper);
-            await this.songsService.LoadSongsInDbAsync();
+            //await this.songsService.LoadSongsInDbAsync();
         }
     }
 }

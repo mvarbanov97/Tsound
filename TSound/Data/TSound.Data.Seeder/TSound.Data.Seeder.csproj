@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\TSound.Common\TSound.Common.csproj" />
     <ProjectReference Include="..\..\Services\TSound.Services\TSound.Services.csproj" />
     <ProjectReference Include="..\TSound.Data.Models\TSound.Data.Models.csproj" />
     <ProjectReference Include="..\TSound.Data\TSound.Data.csproj" />

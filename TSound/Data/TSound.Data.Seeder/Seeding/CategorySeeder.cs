@@ -8,14 +8,14 @@ using TSound.Services.External.SpotifyAuthorization;
 
 namespace TSound.Data.Seeder.Seeding
 {
-    public class GenresSeeder : ISeeder
+    public class CategorySeeder : ISeeder
     {
         private GenreService genreService;
         private UnitOfWork.UnitOfWork unitOfWork;
         private IMapper mapper;
-        private HttpClient http;
+        private HttpClient http = new HttpClient();
         private IConfiguration configuration;
-        private AccountsService accountsService;
+        private IAccountsService accountsService;
 
         public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
