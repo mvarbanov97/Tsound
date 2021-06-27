@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TSound.Data;
 
 namespace TSound.Data.Migrations
 {
     [DbContext(typeof(TSoundDbContext))]
-    partial class TSoundDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210616100644_AddedSongsCountToPlaylist")]
+    partial class AddedSongsCountToPlaylist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,49 +132,29 @@ namespace TSound.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AlbumType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("ExternalUrlsId")
+                    b.Property<Guid>("ArtistId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DeezerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReleaseDate")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("SongCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SpotifyId")
+                    b.Property<string>("SonglistUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("TotalTracks")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Uri")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExternalUrlsId");
-
-                    b.ToTable("Albums");
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.AlbumArtist", b =>
-                {
-                    b.Property<Guid>("AlbumId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("AlbumId", "ArtistId");
-
                     b.HasIndex("ArtistId");
 
-                    b.ToTable("AlbumArtists");
+                    b.ToTable("Albums");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.Artist", b =>
@@ -184,34 +166,43 @@ namespace TSound.Data.Migrations
                     b.Property<int?>("Age")
                         .HasColumnType("int");
 
+                    b.Property<int>("AlbumCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ArtistPageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ExternalUrlsId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeezerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FanCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PictureURL")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("SongCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("SpotifyId")
+                    b.Property<string>("SongListURL")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Uri")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExternalUrlsId");
-
                     b.ToTable("Artists");
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.Category", b =>
+            modelBuilder.Entity("TSound.Data.Models.Genre", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -236,7 +227,7 @@ namespace TSound.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.Playlist", b =>
@@ -244,9 +235,6 @@ namespace TSound.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Collaborative")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -278,9 +266,6 @@ namespace TSound.Data.Migrations
                     b.Property<string>("SpotifyId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Uri")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -291,34 +276,34 @@ namespace TSound.Data.Migrations
                     b.ToTable("Playlists");
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.PlaylistCategory", b =>
+            modelBuilder.Entity("TSound.Data.Models.PlaylistGenre", b =>
                 {
                     b.Property<Guid>("PlaylistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
+                    b.Property<Guid>("GenreId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("PlaylistId", "CategoryId");
+                    b.HasKey("PlaylistId", "GenreId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("GenreId");
 
-                    b.ToTable("PlaylistsCategories");
+                    b.ToTable("PlaylistsGenres");
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.PlaylistTrack", b =>
+            modelBuilder.Entity("TSound.Data.Models.PlaylistSong", b =>
                 {
                     b.Property<Guid>("PlaylistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("TrackId")
+                    b.Property<Guid>("SongId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("PlaylistId", "TrackId");
+                    b.HasKey("PlaylistId", "SongId");
 
-                    b.HasIndex("TrackId");
+                    b.HasIndex("SongId");
 
-                    b.ToTable("PlaylistTracks");
+                    b.ToTable("PlaylistSongs");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.Role", b =>
@@ -349,21 +334,7 @@ namespace TSound.Data.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.SpotifyDomainModels.ExternalUrls", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Spotify")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ExternalUrls");
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.Track", b =>
+            modelBuilder.Entity("TSound.Data.Models.Song", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -375,38 +346,32 @@ namespace TSound.Data.Migrations
                     b.Property<Guid>("ArtistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("DeezerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DurationMs")
+                    b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Explicit")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ExternalUrlsId")
+                    b.Property<Guid>("GenreId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Popularity")
+                    b.Property<string>("PreviewURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rank")
                         .HasColumnType("int");
-
-                    b.Property<string>("PreviewUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SpotifyCategoryId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SpotifyId")
+                    b.Property<string>("SongURL")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Uri")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -415,11 +380,9 @@ namespace TSound.Data.Migrations
 
                     b.HasIndex("ArtistId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("GenreId");
 
-                    b.HasIndex("ExternalUrlsId");
-
-                    b.ToTable("Tracks");
+                    b.ToTable("Songs");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.User", b =>
@@ -568,31 +531,11 @@ namespace TSound.Data.Migrations
 
             modelBuilder.Entity("TSound.Data.Models.Album", b =>
                 {
-                    b.HasOne("TSound.Data.Models.SpotifyDomainModels.ExternalUrls", "ExternalUrls")
-                        .WithMany()
-                        .HasForeignKey("ExternalUrlsId");
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.AlbumArtist", b =>
-                {
-                    b.HasOne("TSound.Data.Models.Album", "Album")
-                        .WithMany("Artists")
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("TSound.Data.Models.Artist", "Artist")
                         .WithMany("Albums")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TSound.Data.Models.Artist", b =>
-                {
-                    b.HasOne("TSound.Data.Models.SpotifyDomainModels.ExternalUrls", "ExternalUrls")
-                        .WithMany()
-                        .HasForeignKey("ExternalUrlsId");
                 });
 
             modelBuilder.Entity("TSound.Data.Models.Playlist", b =>
@@ -604,59 +547,55 @@ namespace TSound.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.PlaylistCategory", b =>
+            modelBuilder.Entity("TSound.Data.Models.PlaylistGenre", b =>
                 {
-                    b.HasOne("TSound.Data.Models.Category", "Category")
+                    b.HasOne("TSound.Data.Models.Genre", "Genre")
                         .WithMany("Playlists")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TSound.Data.Models.Playlist", "Playlist")
-                        .WithMany("Categories")
+                        .WithMany("Genres")
                         .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.PlaylistTrack", b =>
+            modelBuilder.Entity("TSound.Data.Models.PlaylistSong", b =>
                 {
                     b.HasOne("TSound.Data.Models.Playlist", "Playlist")
-                        .WithMany("Tracks")
+                        .WithMany("Songs")
                         .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TSound.Data.Models.Track", "Track")
+                    b.HasOne("TSound.Data.Models.Song", "Song")
                         .WithMany("Playlists")
-                        .HasForeignKey("TrackId")
+                        .HasForeignKey("SongId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TSound.Data.Models.Track", b =>
+            modelBuilder.Entity("TSound.Data.Models.Song", b =>
                 {
                     b.HasOne("TSound.Data.Models.Album", "Album")
-                        .WithMany("Tracks")
+                        .WithMany("Songs")
                         .HasForeignKey("AlbumId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TSound.Data.Models.Artist", "Artist")
-                        .WithMany("Tracks")
+                        .WithMany("Songs")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TSound.Data.Models.Category", "Category")
-                        .WithMany("Tracks")
-                        .HasForeignKey("CategoryId")
+                    b.HasOne("TSound.Data.Models.Genre", "Genre")
+                        .WithMany("Songs")
+                        .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("TSound.Data.Models.SpotifyDomainModels.ExternalUrls", "ExternalUrls")
-                        .WithMany()
-                        .HasForeignKey("ExternalUrlsId");
                 });
 #pragma warning restore 612, 618
         }

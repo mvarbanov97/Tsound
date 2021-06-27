@@ -17,15 +17,17 @@ namespace TSound.Data
 
         public DbSet<Album> Albums { get; set; }
 
-        public DbSet<Genre> Genres { get; set; }
+        public DbSet<AlbumArtist> AlbumArtists { get; set; }
 
-        public DbSet<Song> Songs { get; set; }
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Track> Tracks { get; set; }
 
         public DbSet<Playlist> Playlists { get; set; }
 
-        public DbSet<PlaylistGenre> PlaylistsGenres { get; set; }
+        public DbSet<PlaylistCategory> PlaylistsCategories { get; set; }
 
-        public DbSet<PlaylistSong> PlaylistSongs { get; set; }
+        public DbSet<PlaylistTrack> PlaylistTracks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

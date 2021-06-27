@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TSound.Data;
 
 namespace TSound.Data.Migrations
 {
     [DbContext(typeof(TSoundDbContext))]
-    partial class TSoundDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210622114023_ChangedDomainModelsToWorkWithSpotifyApi")]
+    partial class ChangedDomainModelsToWorkWithSpotifyApi
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -387,14 +389,11 @@ namespace TSound.Data.Migrations
                     b.Property<Guid?>("ExternalUrlsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Popularity")
-                        .HasColumnType("int");
-
                     b.Property<string>("PreviewUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");

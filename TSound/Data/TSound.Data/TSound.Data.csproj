@@ -15,6 +15,14 @@
     <Compile Remove="Migrations\20210227150530_Test.Designer.cs" />
     <Compile Remove="Migrations\20210227150709_Test.cs" />
     <Compile Remove="Migrations\20210227150709_Test.Designer.cs" />
+    <Compile Remove="Migrations\20210617141302_ChangedDomainModelsToWorkWithSpotifyApi.cs" />
+    <Compile Remove="Migrations\20210617141302_ChangedDomainModelsToWorkWithSpotifyApi.Designer.cs" />
+    <Compile Remove="Migrations\20210617141731_ChangedDomainModelsToWorkWithSpotifyApi.cs" />
+    <Compile Remove="Migrations\20210617141731_ChangedDomainModelsToWorkWithSpotifyApi.Designer.cs" />
+    <Compile Remove="Migrations\20210622062544_ChangedDomainModelsToWorkWithSpotifyApi.cs" />
+    <Compile Remove="Migrations\20210622062544_ChangedDomainModelsToWorkWithSpotifyApi.Designer.cs" />
+    <Compile Remove="Migrations\20210623080028_ReplaceRankPropertyWithPopularity.cs" />
+    <Compile Remove="Migrations\20210623080028_ReplaceRankPropertyWithPopularity.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
