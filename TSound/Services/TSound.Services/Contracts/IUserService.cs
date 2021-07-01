@@ -9,12 +9,20 @@ namespace TSound.Services.Contracts
 {
     public interface IUserService : IService
     {
-        Task<IEnumerable<UserServiceModel>> GetAllUsersAsync();
+        Task<UserServiceModel> GetUserByIdAsync(Guid id);
+
+        Task<IEnumerable<UserServiceModel>> GetAllUsersAsync(bool isAdmin = false, int page = 1);
 
         Task<UserServiceModel> GetUserByEmailAsync(string email);
 
         Task<string> GetUserSpotifyId(string id);
 
         Task<UserSpotify> GetSpotifyUser(string id, string accessToken);
+
+        Task<UserSpotify> GetCurrentUserSpotifyProfile(string accessToken);
+
+        int GetTotalUsersCount();
+
+        int GetPageCountSizing();
     }
 }

@@ -26,10 +26,7 @@ namespace TSound.Services
     public class PlaylistService : IPlaylistService
     {
         private readonly IUnitOfWork unitOfWork;
-        private readonly ServiceValidator validator;
         private readonly IDateTimeProvider dateTimeProvider;
-        private readonly IAccountsService accountsService;
-        private readonly IUserService userService;
         private readonly IMapper mapper;
         private readonly HttpClient http;
 
@@ -37,15 +34,12 @@ namespace TSound.Services
             IUnitOfWork unitOfWork,
             IDateTimeProvider dateTimeProvider,
             IMapper mapper,
-            HttpClient http,
-            IAccountsService accountsService, IUserService userService)
+            HttpClient http)
         {
             this.unitOfWork = unitOfWork;
             this.dateTimeProvider = dateTimeProvider;
             this.mapper = mapper;
             this.http = http;
-            this.accountsService = accountsService;
-            this.userService = userService;
         }
 
         /// <summary>
@@ -55,10 +49,6 @@ namespace TSound.Services
         /// <returns>A task that represents a PlaylistServiceModel that holds all information on the newly created user, including the new Guid id.</returns>
         public async Task<PlaylistServiceModel> CreatePlaylistAsync(PlaylistServiceModel playlistServiceModel)
         {
-            //this.validator.ValidateIfNameIsNullOrEmpty(playlistServiceModel.Name);
-            //this.validator.ValidateIfAuthorExistsInDb(playlistServiceModel.UserId);
-            //this.validator.ValidateIfAuthorIsDeleted(playlistServiceModel.UserId);
-
             playlistServiceModel.DateCreated = dateTimeProvider.GetDateTime();
             playlistServiceModel.DateModified = dateTimeProvider.GetDateTime();
 
@@ -79,6 +69,42 @@ namespace TSound.Services
             return playlistServiceModel;
         }
 
+        public async Task AddTracksToPlaylist(Guid playlistId, IEnumerable<SpotifyPlaylistModel.PlaylistTrack> tracks)
+        {
+            var playlistToUpdate = await this.unitOfWork.Playlists.All().AsNoTracking().FirstOrDefaultAsync(x => x.Id == playlistId);
+
+            foreach (var track in tracks)
+            {
+                var trackToAdd = await this.unitOfWork.Tracks.All().AsNoTracking().FirstOrDefaultAsync(x => x.SpotifyId == track.Track.Id);
+
+                await this.unitOfWork.PlaylistTracks.AddAsync(new Data.Models.PlaylistTrack
+                {
+                    PlaylistId = playlistToUpdate.Id,
+                    TrackId = trackToAdd.Id
+                });
+            }
+
+            await this.unitOfWork.CompleteAsync();
+        }
+
+        public async Task AddCategoriesToPlaylist(Guid playlistId, IEnumerable<string> categoryIds)
+        {
+            var playlistToUpdate = await this.unitOfWork.Playlists.All().FirstOrDefaultAsync(x => x.Id == playlistId);
+
+            foreach (var category in categoryIds)
+            {
+                var categoryToAdd = await this.unitOfWork.Categories.All().FirstOrDefaultAsync(x => x.SpotifyId == category);
+
+                await this.unitOfWork.PlaylistCategories.AddAsync(new PlaylistCategory
+                {
+                    PlaylistId = playlistToUpdate.Id,
+                    CategoryId = categoryToAdd.Id
+                });
+            }
+
+            await this.unitOfWork.CompleteAsync();
+        }
+
         /// <summary>
         /// An async method that deletes a playlist if a playlist with such id (from the parameter of the method) exists.
         /// </summary>
@@ -88,16 +114,16 @@ namespace TSound.Services
         /// <returns>A task that represents a boolean that reveals if the action is successfully achieved.</returns>
         public async Task<bool> DeletePlaylistAsync(Guid playlistId, bool isApiKeyRequired = false, Guid? userApiKey = null)
         {
-            this.validator.ValidatePlaylistId(playlistId);
-            this.validator.ValidateIfPlaylistIsUnlisted(playlistId);
-            this.validator.ValidateIfPlaylistIsDeleted(playlistId);
+            this.ValidatePlaylistId(playlistId);
+            this.ValidateIfPlaylistIsUnlisted(playlistId);
+            this.ValidateIfPlaylistIsDeleted(playlistId);
 
             User userWithApiKey = null;
 
             if (isApiKeyRequired)
             {
                 userWithApiKey = await this.ValidateAPIKeyAsync(userApiKey, this.unitOfWork);
-                this.validator.ValidateIfUserWithThisApiKeyIsTheAuthorOfPlaylist(playlistId, userWithApiKey);
+                this.ValidateIfUserWithThisApiKeyIsTheAuthorOfPlaylist(playlistId, userWithApiKey);
             }
 
             var playlistInDb = await this.unitOfWork.Playlists.All().FirstAsync(x => x.Id == playlistId);
@@ -125,9 +151,9 @@ namespace TSound.Services
                 .Where(x => x.IsDeleted == false)
                 .Where(x => x.DurationTravel != 0)
                 .Include(x => x.User)
-                .Include(x => x.Genres)
-                .Include(x => x.Songs)
-                .ThenInclude(playlistSong => playlistSong.Song)
+                .Include(x => x.Categories)
+                .Include(x => x.Tracks)
+                .ThenInclude(playlistSong => playlistSong.Track)
                 .ToListAsync();
 
             if (!isAdmin)
@@ -144,14 +170,14 @@ namespace TSound.Services
             if (isApiKeyRequired)
                 await this.ValidateAPIKeyAsync(userApiKey, this.unitOfWork);
 
-            this.validator.ValidatePlaylistId(playlistId);
-            this.validator.ValidateIfPlaylistIsDeleted(playlistId);
+            this.ValidatePlaylistId(playlistId);
+            this.ValidateIfPlaylistIsDeleted(playlistId);
 
             Playlist playlist = await this.unitOfWork.Playlists.All()
                 .Include(x => x.User)
-                .Include(x => x.Genres)
-                .Include(x => x.Songs)
-                .ThenInclude(playlistSong => playlistSong.Song)
+                .Include(x => x.Categories)
+                .Include(x => x.Tracks)
+                .ThenInclude(playlistSong => playlistSong.Track)
                 .FirstOrDefaultAsync(p => p.Id == playlistId);
 
             PlaylistServiceModel playlistServiceModel = this.mapper.Map<PlaylistServiceModel>(playlist);
@@ -176,28 +202,26 @@ namespace TSound.Services
                     .Where(x => x.UserId == userId)
                     .Where(x => x.IsDeleted == false)
                     .Where(x => x.DurationTravel != 0)
-                    .Include(x => x.Genres)
-                    .Include(x => x.Songs)
-                    .ThenInclude(playlistSong => playlistSong.Song)
+                    .Include(x => x.Categories)
+                    .Include(x => x.Tracks)
+                    .ThenInclude(playlistSong => playlistSong.Track)
                     .ToListAsync();
 
                 return this.mapper.Map<IEnumerable<PlaylistServiceModel>>(playlistsOfThisUser);
             }
         }
 
-        public async Task<string[]> GeneratePlaylistAsync(Guid playlistId, int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken)
+        public async Task<IEnumerable<SpotifyPlaylistModel.PlaylistTrack>> GenerateTracksForPlaylistAsync(int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken)
         {
-            this.ValidatePlaylistId(playlistId);
-            this.ValidateDurationTravel(durationTravel);
-
             Random random = new Random();
             int durationDubbedCurrent = 0;
-            var trackUrisToAdd = new string[100];
+            var trackUrisToAdd = new List<string>(100);
+            var tracks = new List<SpotifyPlaylistModel.PlaylistTrack>();
 
             // If for some reason we don't receive any Genres by the User - use all available Genres.
             if (categoryIdsToUse == null || categoryIdsToUse.Count() == 0)
             {
-                categoryIdsToUse = this.unitOfWork.Genres.All().Select(x => x.SpotifyId);
+                categoryIdsToUse = this.unitOfWork.Categories.All().Select(x => x.SpotifyId);
             }
 
             while (true)
@@ -214,29 +238,52 @@ namespace TSound.Services
 
                 var randomTracksOfPlaylist = await this.GetPlaylistTracks<PlaylistPaged>(randomPlaylist.Items[0].Id, userAccessToken, null, random.Next(1, 3), random.Next(1, 20));
 
-                for (int i = 0; i < randomTracksOfPlaylist.Items.Count(); i++)
+                var tracksToAdd = randomTracksOfPlaylist.Items.ToList();
+                tracksToAdd.Select(x => { x.Track.SpotifyCategoryId = randomCategoryId; return x; }).ToList();
+
+                foreach (var track in tracksToAdd)
                 {
-                    trackUrisToAdd[i] = randomTracksOfPlaylist.Items[i].Track.Uri;
-                    durationDubbedCurrent += randomTracksOfPlaylist.Items[i].Track.DurationMs;
+                    if (!tracks.Contains(track))
+                    {
+                        tracks.Add(track);
+                        durationDubbedCurrent += track.Track.DurationMs;
+                    }
                 }
+
             }
-            
-            // Remove any emty values in the array, so the POST request to Spotify Playlist Api do not fail
-            return trackUrisToAdd.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return tracks;
         }
 
         public async Task<bool> UpdatePlaylistDurationTravelAsync(Guid id, int durationTravel)
         {
-            this.validator.ValidatePlaylistId(id);
-            this.validator.ValidateIfPlaylistIsDeleted(id);
+            this.ValidatePlaylistId(id);
+            this.ValidateIfPlaylistIsDeleted(id);
 
-            this.validator.ValidateDurationTravel(durationTravel);
+            this.ValidateDurationTravel(durationTravel);
 
             var playlist = await this.unitOfWork.Playlists.All().FirstAsync(x => x.Id == id);
 
             playlist.DurationTravel = durationTravel;
             await this.unitOfWork.CompleteAsync();
             return true;
+        }
+
+        public async Task UpdatePlaylistCoverImageAsync(Guid playlistId, string coverImageUrl)
+        {
+            var playlist = await this.unitOfWork.Playlists.All().FirstAsync(x => x.Id == playlistId);
+
+            playlist.Image = coverImageUrl;
+
+            await this.unitOfWork.CompleteAsync();
+        }
+
+        public async Task UpdatePlaylistSongsCountAsync(Guid playlistId, int count)
+        {
+            var playlist = await this.unitOfWork.Playlists.All().FirstAsync(x => x.Id == playlistId);
+
+            playlist.SongsCount = count;
+
+            await this.unitOfWork.CompleteAsync();
         }
 
         public async Task<T> GetCategoryPlaylists<T>(
@@ -305,6 +352,15 @@ namespace TSound.Services
             return default(T);
         }
 
+        public async Task<IEnumerable<PlaylistServiceModel>> Get3RandomPlaylists()
+        {
+            var random = new Random();
+            var threeRandomPlaylists = await this.unitOfWork.Playlists.All().Skip(random.Next(1, 5)).Take(3).ToListAsync();
+
+            var result = this.mapper.Map<IEnumerable<PlaylistServiceModel>>(threeRandomPlaylists);
+            return result;
+        }
+
         private void ValidateIfUserWithThisApiKeyIsTheAuthorOfPlaylist(Guid playlistId, User user)
         {
             ValidatePlaylistId(playlistId);
@@ -333,75 +389,20 @@ namespace TSound.Services
             }
         }
 
-        //protected internal virtual async Task<T> GetModelFromProperty<T>(
-        //    Uri uri,
-        //    string rootPropertyName,
-        //    string accessToken = null)
-        //{
-        //    var jObject = await GetJObject(uri, accessToken: accessToken);
-        //    if (jObject == null) return default;
-        //    return jObject[rootPropertyName].ToObject<T>();
-        //}
+        public void ValidateIfPlaylistIsDeleted(Guid id)
+        {
+            if (this.unitOfWork.Playlists.All().First(x => x.Id == id).IsDeleted)
+            {
+                throw new ArgumentException("Playlist is deleted.");
+            }
+        }
 
-        //protected internal virtual async Task<JObject> GetJObject(Uri uri, string accessToken = null)
-        //{
-        //    string json = await this.http.Get
-        //    (
-        //        uri,
-        //        new AuthenticationHeaderValue("Bearer", accessToken ?? (await this.accountsService.GetAccessToken()))
-        //    );
-
-        //    // Todo #25 return 204 no content result 
-        //    if (string.IsNullOrEmpty(json)) return null;
-
-        //    JObject deserialized = JsonConvert.DeserializeObject(json) as JObject;
-        //    if (deserialized == null)
-        //        throw new InvalidOperationException($"Failed to deserialize response as JSON. Response = {json.Substring(0, Math.Min(json.Length, 256))}");
-
-        //    return deserialized;
-        //}
-
-
-        //public async Task<T> CreateSpotifyPlaylist<T>(
-        //    string userId,
-        //    PlaylistDetails details,
-        //    string accessToken = null)
-        //{
-        //    if (string.IsNullOrWhiteSpace(userId)) throw new
-        //            ArgumentException("A valid Spotify user id must be specified.");
-
-        //    if (details == null || string.IsNullOrWhiteSpace(details.Name)) throw new
-        //            ArgumentException("A PlaylistDetails object param with new playlist name must be provided.");
-
-        //    this.http.DefaultRequestHeaders.Authorization =
-        //        new AuthenticationHeaderValue("Bearer", accessToken ?? (await this.accountsService.GetAccessToken()));
-
-        //    StringContent content = null;
-
-
-        //    content = new StringContent(JsonConvert.SerializeObject(details));
-        //    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-
-        //    HttpResponseMessage response = null;
-        //    var builder = new UriBuilder($"https://api.spotify.com/v1/playlists/{userId}/tracks");
-
-        //    response = await this.http.PostAsync(builder.Uri.ToString(), content);
-
-        //    var spotifyResponse = new SpotifyResponse<T>
-        //    {
-        //        StatusCode = response.StatusCode,
-        //        ReasonPhrase = response.ReasonPhrase
-        //    };
-
-        //    if (response.Content != null)
-        //    {
-        //        string json = await response.Content.ReadAsStringAsync();
-        //        if (!string.IsNullOrEmpty(json)) spotifyResponse.Data = JsonConvert.DeserializeObject<T>(json);
-        //    }
-
-        //    var userSpotifyId = await this.userService.GetUserSpotifyId(userId);
-        //    return default(T); 
-        //}
+        private void ValidateIfPlaylistIsUnlisted(Guid id)
+        {
+            if (this.unitOfWork.Playlists.All().First(x => x.Id == id).IsUnlisted)
+            {
+                throw new ArgumentException("Playlist is unlisted.");
+            }
+        }
     }
 }
