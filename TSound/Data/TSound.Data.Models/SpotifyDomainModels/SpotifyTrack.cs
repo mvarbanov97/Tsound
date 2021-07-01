@@ -118,6 +118,8 @@ namespace TSound.Data.Models.SpotifyDomainModels
         /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; }
+
+        public string SpotifyCategoryId { get; set; }
     }
 
     public partial class VideoThumbnail

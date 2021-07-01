@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace TSound.Data.Models.SpotifyDomainModels
@@ -13,6 +14,9 @@ namespace TSound.Data.Models.SpotifyDomainModels
     /// </remarks>
     public partial class ExternalUrls
     {
+        [Key]
+        public Guid Id { get; set; }
+
         [JsonProperty("spotify")]
         public string Spotify { get; set; }
     }

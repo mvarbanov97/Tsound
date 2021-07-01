@@ -10,18 +10,17 @@ namespace TSound.Data.Seeder.Seeding
 {
     public class CategorySeeder : ISeeder
     {
-        private GenreService genreService;
+        private CategoryService genreService;
         private UnitOfWork.UnitOfWork unitOfWork;
         private IMapper mapper;
         private HttpClient http = new HttpClient();
         private IConfiguration configuration;
-        private IAccountsService accountsService;
 
         public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
             this.unitOfWork = new UnitOfWork.UnitOfWork(dbContext);
-            this.genreService = new GenreService(this.unitOfWork, this.mapper, this.http, this.configuration, this.accountsService);
-            await this.genreService.LoadGenresInDbAsync();
+            this.genreService = new CategoryService(this.unitOfWork, this.mapper, this.http, this.configuration);
+            await this.genreService.LoadCategoriesInDb();
         }
     }
 }
