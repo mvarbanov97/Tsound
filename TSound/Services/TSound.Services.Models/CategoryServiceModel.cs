@@ -2,7 +2,7 @@
 
 namespace TSound.Services.Models
 {
-    public class GenreServiceModel
+    public class CategoryServiceModel
     {
         public Guid Id { get; set; }
 
@@ -12,5 +12,6 @@ namespace TSound.Services.Models
 
         public string PictureURL { get; set; }
 
+        public string ImageUrl { get; set; }
     }
 }

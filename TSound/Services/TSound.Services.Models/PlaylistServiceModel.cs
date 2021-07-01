@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TSound.Data.Models;
 
 namespace TSound.Services.Models
 {
@@ -30,8 +31,15 @@ namespace TSound.Services.Models
 
         public bool IsUnlisted { get; set; }
 
+        public int CategoriesCount { get; set; }
+
+        public int SongsCount { get; set; }
+
+        public User User { get; set; }
         public Guid UserId { get; set; }
         public string UserName { get; set; }
-        public string UserImage { get; set; }
+        public string UserImageUrl { get; set; }
+
+        public ICollection<PlaylistTrack> Tracks = new HashSet<PlaylistTrack>();
     }
 }

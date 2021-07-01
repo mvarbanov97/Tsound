@@ -4,19 +4,21 @@ using System.Text;
 
 namespace TSound.Services.Models
 {
-    public class SongServiceModel
+    public class TrackServiceModel
     {
         public Guid Id { get; set; }
 
+        public string  SpotifyId { get; set; }
+
         public string Name { get; set; }
 
-        public string SongURL { get; set; }
+        public int DurationMs { get; set; }
 
-        public int Duration { get; set; }
+        public int Popularity { get; set; }
 
-        public int Rank { get; set; }
+        public string PreviewUrl { get; set; }
 
-        public string PreviewURL { get; set; }
+        public string Uri { get; set; }
 
         public string Album { get; set; }
 
