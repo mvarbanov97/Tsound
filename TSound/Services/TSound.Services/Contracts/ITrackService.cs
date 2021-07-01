@@ -10,14 +10,14 @@ namespace TSound.Services.Contracts
 {
     public interface ITrackService : IService
     {
-        Task<SongServiceModel> GetTrackByIdAsync(Guid songId);
+        Task<TrackServiceModel> GetTrackByIdAsync(Guid songId);
 
-        Task<IEnumerable<SongServiceModel>> GetAllTracksAsync();
+        Task<IEnumerable<TrackServiceModel>> GetAllTracksAsync();
 
         Task<IEnumerable<Track>> AddTracksToDbAsync(IEnumerable<SpotifyPlaylistModel.PlaylistTrack> tracks);
 
-        Task<IEnumerable<SongServiceModel>> GetTracksByPlaylistIdAsync(Guid playlistId);
+        Task<IEnumerable<TrackServiceModel>> GetTracksByPlaylistIdAsync(Guid playlistId);
 
-        Task<IEnumerable<SongServiceModel>> GetTop3TracksAsync();
+        Task<IEnumerable<TrackServiceModel>> GetTop3TracksAsync();
     }
 }

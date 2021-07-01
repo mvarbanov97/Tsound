@@ -34,29 +34,29 @@ namespace TSound.Services
             this.configuration = configuration;
         }
 
-        public async Task<GenreServiceModel> GetCategoryByIdAsync(Guid categoryId)
+        public async Task<CategoryServiceModel> GetCategoryByIdAsync(Guid categoryId)
         {
             var category = await this.unitOfWork.Categories.All().FirstOrDefaultAsync(x => x.Id == categoryId);
 
             if (category == null)
                 throw new ArgumentNullException("Category Not Found.");
 
-            var categoryServiceModel = this.mapper.Map<GenreServiceModel>(category);
+            var categoryServiceModel = this.mapper.Map<CategoryServiceModel>(category);
 
             return categoryServiceModel;
         }
         
-        public async Task<IEnumerable<GenreServiceModel>> GetCategoryByPlaylistIdAsync(Guid playlistId)
+        public async Task<IEnumerable<CategoryServiceModel>> GetCategoryByPlaylistIdAsync(Guid playlistId)
         {
             var categoryFromThisPlaylistServiceModels = await this.unitOfWork.PlaylistCategories.All()
                 .Where(x => x.PlaylistId == playlistId)
                 .Select(x => this.unitOfWork.Categories.All().First(y => y.Id == x.CategoryId))
                 .ToListAsync();
 
-            return this.mapper.Map<IEnumerable<GenreServiceModel>>(categoryFromThisPlaylistServiceModels);
+            return this.mapper.Map<IEnumerable<CategoryServiceModel>>(categoryFromThisPlaylistServiceModels);
         }
 
-        public async Task<IEnumerable<GenreServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, System.Guid? apiKey = null)
+        public async Task<IEnumerable<CategoryServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, System.Guid? apiKey = null)
         {
             if (requireApiKey)
                 await this.ValidateAPIKeyAsync(apiKey, this.unitOfWork);
@@ -64,9 +64,9 @@ namespace TSound.Services
             var genres = this.unitOfWork.Categories.All();
 
             if (genres == null)
-                return new List<GenreServiceModel>();
+                return new List<CategoryServiceModel>();
 
-            var result = this.mapper.Map<IEnumerable<GenreServiceModel>>(genres);
+            var result = this.mapper.Map<IEnumerable<CategoryServiceModel>>(genres);
 
             return result;
         }

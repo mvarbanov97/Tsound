@@ -29,7 +29,7 @@ namespace TSound.Services
             this.mapper = mapper;
         }
 
-        public async Task<SongServiceModel> GetTrackByIdAsync(Guid trackId)
+        public async Task<TrackServiceModel> GetTrackByIdAsync(Guid trackId)
         {
             var song = await this.unitOfWork.Tracks.All()
                 .Include(s => s.Album)
@@ -40,19 +40,19 @@ namespace TSound.Services
             if (song == null)
                 throw new ArgumentNullException("Track Not Found.");
 
-            var songServiceModel = this.mapper.Map<SongServiceModel>(song);
+            var songServiceModel = this.mapper.Map<TrackServiceModel>(song);
 
             return songServiceModel;
         }
 
-        public async Task<IEnumerable<SongServiceModel>> GetAllTracksAsync()
+        public async Task<IEnumerable<TrackServiceModel>> GetAllTracksAsync()
         {
             var songs = this.unitOfWork.Tracks.All()
                 .Include(s => s.Album)
                 .Include(s => s.Artist)
                 .Include(s => s.Category);
 
-            var songServiceModels = this.mapper.Map<IEnumerable<SongServiceModel>>(songs);
+            var songServiceModels = this.mapper.Map<IEnumerable<TrackServiceModel>>(songs);
 
             return songServiceModels;
         }
@@ -75,7 +75,7 @@ namespace TSound.Services
             return tracksToAdd;
         }
 
-        public async Task<IEnumerable<SongServiceModel>> GetTracksByPlaylistIdAsync(Guid playlistId)
+        public async Task<IEnumerable<TrackServiceModel>> GetTracksByPlaylistIdAsync(Guid playlistId)
         {
             var tracks = this.unitOfWork.PlaylistTracks.All()
                 .Where(s => s.PlaylistId == playlistId)
@@ -87,12 +87,12 @@ namespace TSound.Services
                 .ThenInclude(t => t.Category)
                 .Select(t => t.Track);
 
-            var songServiceModel = this.mapper.Map<IEnumerable<SongServiceModel>>(tracks);
+            var songServiceModel = this.mapper.Map<IEnumerable<TrackServiceModel>>(tracks);
 
             return await Task.FromResult(songServiceModel);
         }
 
-        public async Task<IEnumerable<SongServiceModel>> GetTop3TracksAsync()
+        public async Task<IEnumerable<TrackServiceModel>> GetTop3TracksAsync()
         {
             var random = new Random();
 
@@ -102,7 +102,7 @@ namespace TSound.Services
                 .Take(3)
                 .ToListAsync();
 
-            var trackServiceModel = this.mapper.Map<IEnumerable<SongServiceModel>>(tracks);
+            var trackServiceModel = this.mapper.Map<IEnumerable<TrackServiceModel>>(tracks);
 
             return trackServiceModel;
         }

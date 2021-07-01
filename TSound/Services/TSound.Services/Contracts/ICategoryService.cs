@@ -9,11 +9,11 @@ namespace TSound.Services.Contracts
 {
     public interface ICategoryService : IService
     {
-        Task<GenreServiceModel> GetCategoryByIdAsync(Guid genreId);
+        Task<CategoryServiceModel> GetCategoryByIdAsync(Guid genreId);
 
-        Task<IEnumerable<GenreServiceModel>> GetCategoryByPlaylistIdAsync(Guid id);
+        Task<IEnumerable<CategoryServiceModel>> GetCategoryByPlaylistIdAsync(Guid id);
 
-        Task<IEnumerable<GenreServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, Guid? apiKey = null);
+        Task<IEnumerable<CategoryServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, Guid? apiKey = null);
 
         Task LoadCategoriesInDb();
 
