@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TSound.Web.Models.ViewModels.Song
+namespace TSound.Web.Models.ViewModels.Track
 {
-    public class SongViewModel
+    public class TrackViewModel
     {
         public Guid Id { get; set; }
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TSound.Web.Models.ViewModels.Genre
+namespace TSound.Web.Models.ViewModels.Category
 {
-    public class GenreViewModel
+    public class CategoryViewModel
     {
         public Guid Id { get; set; }
 
