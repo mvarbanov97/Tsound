@@ -1,4 +1,6 @@
-﻿@{
+﻿@model HomePageViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -27,9 +29,6 @@
                                     <h4 class="card-title text-left text-secondary">
                                         Current User: @this.UserManager.GetUserId(this.User)
                                     </h4>
-                                    <h4 class="card-title text-left text-secondary">
-                                        <iframe src="https://open.spotify.com/embed/playlist/0V0MEtXbztRpRHCivElk8L" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-                                    </h4>
                                 </div>
                                 <p class="text-left">
                                     <input type="button" class="btn btn-lg btn-primary btn-round text-seconday" value="Create a Playlist!" onclick="window.location='@Url.Action("Create", "Playlists")'" style="opacity: 0.9" />
@@ -45,51 +44,95 @@
         </div>
 
         <div class="row text-center">
-            @*@foreach (var playlist in Model.Top3Playlists)
-                {*@
-            <div class="col-md-4">
-                <div class="card p-3 text-center">
-                    <h4 class="text-center">Playlist Name </h4>
-                    <div class="text-center">
-                        <a href="@*@Url.Action(" PlaylistById", "Playlists" , new { id=playlist.Id })*@">
-                            <img src="playlist.Image" class="img-circle-lg" />
-                        </a>
-                    </div>
-                    <br />
-                    <p class="text-center" id="playlist-description" style="font-size: 14px;"><i>Playlist Description Here</i></p>
-                    <br />
-                    <div class="row text-center style=" font-size: 12px;"">
-                        <div class="col-md-4 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
-                        <div class="col-md-4 text-center"><p><i class="tim-icons icon-chart-bar-32"></i></p></div>
-                        <div class="col-md-4 text-center"><p style="font-size: 12px;">Songs</p></div>
-                    </div>
-                    <div class="row text-center">
-                        <div class="col-md-4 text-center"><p style="font-size: 10px;">Playlist Duration Here min</p></div>
-                        <div class="col-md-4 text-center"><p style="font-size: 10px;">Playlist Rank</p></div>
-                        <div class="col-md-4 text-center"><p style="font-size: 10px;">Songs count Here</p></div>
-                    </div>
-                    <br />
-                    <div>
-                        @*<input type="button" class="btn btn-primary btn-round text-center" value="View" o onclick="window.location='@Url.Action("PlaylistById", "Playlists", new { id = playlist.Id })'">*@
+            @foreach (var playlist in Model.Top3Playlists)
+            {
+                <div class="col-md-4">
+                    <div class="card p-3 text-center">
+                        <h4 class="text-center">@playlist.Name</h4>
+                        <div class="text-center">
+                            <a href="@Url.Action(" PlaylistById", "Playlists" , new { id=playlist.Id })">
+                                <img src="@playlist.Image" class="img-circle-lg" />
+                            </a>
+                        </div>
+                        <br />
+                        <p class="text-center" id="playlist-description" style="font-size: 14px;"><i>@playlist.Description</i></p>
+                        <br />
+                        <div class="row text-center style=" font-size: 12px;"">
+                            <div class="col-md-6 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
+                            <div class="col-md-6 text-center"><p style="font-size: 12px;">Songs</p></div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-md-6 text-center"><p style="font-size: 10px;">@((playlist.DurationTravel / 1000) / 60) min</p></div>
+                            <div class="col-md-6 text-center"><p style="font-size: 10px;">@playlist.SongsCount</p></div>
+                        </div>
+                        <br />
+                        <div>
+                            <input type="button" class="btn btn-primary btn-round text-center" value="View" o onclick="window.location='@Url.Action("PlaylistById", "Playlists", new { id = playlist.Id })'">
+                        </div>
                     </div>
                 </div>
-            </div>
-            @*}*@
+            }
         </div>
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="text-center">Check out our Top 3 Songs:</h3>
             </div>
         </div>
-        @*<div class="row">
-                @foreach (var song in Model.Top3Songs)
-                {
-                    <div class="col-md-4 text-center">
-                        <div class="card p-3">
-                            <partial name="_SongWidgetPartial_Small" model="song" />
+        <div class="row">
+            @foreach (var song in Model.Top3Songs)
+            {
+                <div class="col-md-4 text-center">
+                    <div class="card p-3">
+                        <iframe src="https://open.spotify.com/embed/track/@song.SpotifyId" width="300" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-3" id="news-column" style="padding-left:25px; padding-right:15px; padding-bottom:35px;">
+
+        <div class="row text-center">
+            <div class="card">
+                <br />
+                <div class="card-title"><h4>Latest Music News:</h4></div>
+            </div>
+        </div>
+        @if (Model.Top3News.Count() == 0)
+        {
+            <div class="row">
+                <div class="card p-3 text-center">
+                    <div class="card-body">
+                        <b>Could not connect to news API.</b>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var news in Model.Top3News)
+            {
+                <div class="row">
+                    <div class="card text-center" id="news-card-container" style="padding-left:5px; padding-right:5px;">
+                        <div class="card-title">
+                            <br />
+                            <h4>@news.Title</h4>
+                            by @news.Publisher
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                <img class="rounded" id="news-card-body" src="@news.ImageUrl" alt="Article_Image" style="width: 50%" ; />
+                            </p>
+                            <br />
+                            <p>
+                                @news.Content
+                            </p>
+                            <br />
+                            <a class="btn btn-success btn-round" href="@news.Link" target="_blank" id="news-read-more" style="width:90%;">Read more</a>
                         </div>
                     </div>
-                }
-            </div>*@
+                </div>
+            }
+        }
     </div>
 </div>
