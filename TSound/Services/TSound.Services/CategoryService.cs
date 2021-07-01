@@ -19,41 +19,49 @@ using TSound.Services.Models;
 
 namespace TSound.Services
 {
-    public class GenreService : IGenreService
+    public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IConfiguration configuration;
-        private readonly IAccountsService accountsService;
         private HttpClient http;
 
-        public GenreService(IUnitOfWork unitOfWork, IMapper mapper, HttpClient http, IConfiguration configuration, IAccountsService accountsService)
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper, HttpClient http, IConfiguration configuration)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.http = http;
             this.configuration = configuration;
-            this.accountsService = accountsService;
         }
 
-        public async Task<GenreServiceModel> GetGenreByIdAsync(Guid genreId)
+        public async Task<GenreServiceModel> GetCategoryByIdAsync(Guid categoryId)
         {
-            var genre = await this.unitOfWork.Genres.All().FirstOrDefaultAsync(x => x.Id == genreId);
+            var category = await this.unitOfWork.Categories.All().FirstOrDefaultAsync(x => x.Id == categoryId);
 
-            if (genre == null)
-                throw new ArgumentNullException("Genre Not Found.");
+            if (category == null)
+                throw new ArgumentNullException("Category Not Found.");
 
-            var genreServiceModel = this.mapper.Map<GenreServiceModel>(genre);
+            var categoryServiceModel = this.mapper.Map<GenreServiceModel>(category);
 
-            return genreServiceModel;
+            return categoryServiceModel;
+        }
+        
+        public async Task<IEnumerable<GenreServiceModel>> GetCategoryByPlaylistIdAsync(Guid playlistId)
+        {
+            var categoryFromThisPlaylistServiceModels = await this.unitOfWork.PlaylistCategories.All()
+                .Where(x => x.PlaylistId == playlistId)
+                .Select(x => this.unitOfWork.Categories.All().First(y => y.Id == x.CategoryId))
+                .ToListAsync();
+
+            return this.mapper.Map<IEnumerable<GenreServiceModel>>(categoryFromThisPlaylistServiceModels);
         }
 
-        public async Task<IEnumerable<GenreServiceModel>> GetAllGenresAsync(bool requireApiKey = false, System.Guid? apiKey = null)
+        public async Task<IEnumerable<GenreServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, System.Guid? apiKey = null)
         {
             if (requireApiKey)
                 await this.ValidateAPIKeyAsync(apiKey, this.unitOfWork);
 
-            var genres = this.unitOfWork.Genres.All();
+            var genres = this.unitOfWork.Categories.All();
 
             if (genres == null)
                 return new List<GenreServiceModel>();
@@ -63,16 +71,16 @@ namespace TSound.Services
             return result;
         }
 
-        public async Task LoadGenresInDbAsync()
+        public async Task LoadCategoriesInDb()
         {
-            if (this.DatabaseContainsGenres())
+            if (this.DatabaseContainsCategories())
                 return;
 
             var categories = await this.GetSpotifyCategoriesFromApi<PagedCategories>();
 
             foreach (var category in categories.Items)
             {
-                Genre genre = new Genre
+                Category genre = new Category
                 {
                     SpotifyId = category.Id,
                     Name = category.Name,
@@ -80,7 +88,7 @@ namespace TSound.Services
                     ImageUrl = category.Icons.First().Url,
                 };
 
-                await this.unitOfWork.Genres.AddAsync(genre);
+                await this.unitOfWork.Categories.AddAsync(genre);
             }
 
             await this.unitOfWork.CompleteAsync();
@@ -116,9 +124,9 @@ namespace TSound.Services
                 throw new HttpRequestException("Invalid request sent to the Spotify API.");
         }
 
-        private bool DatabaseContainsGenres()
+        private bool DatabaseContainsCategories()
         {
-            if (this.unitOfWork.Genres == null || this.unitOfWork.Genres.All().Count() == 0)
+            if (this.unitOfWork.Categories == null || this.unitOfWork.Categories.All().Count() == 0)
                 return false;
 
             return true;
