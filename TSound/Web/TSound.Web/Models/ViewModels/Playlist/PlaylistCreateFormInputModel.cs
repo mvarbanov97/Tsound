@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using TSound.Web.Models.ViewModels.Genre;
+using TSound.Web.Models.ViewModels.Category;
 
 namespace TSound.Web.Models.ViewModels.Playlist
 {
@@ -20,9 +20,9 @@ namespace TSound.Web.Models.ViewModels.Playlist
 
         public bool IsTracksFromSameArtistEnabled { get; set; }
 
-        public List<GenreFullViewModel> Genres { get; set; }
+        public List<CategoryFullViewModel> Categories { get; set; }
 
-        public List<string> GenresIdChosenByUser { get; set; }
+        public List<string> CategoryIdsChosenByUser { get; set; }
 
         public int DurationMS { get; set; }
     }

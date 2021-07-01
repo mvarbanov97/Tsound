@@ -6,11 +6,13 @@ using System.Text;
 using TSound.Data.Models;
 using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Services.Models;
+using TSound.Services.Models.News;
+using TSound.Web.Models.ViewModels;
 using TSound.Web.Models.ViewModels.Album;
 using TSound.Web.Models.ViewModels.Artist;
-using TSound.Web.Models.ViewModels.Genre;
+using TSound.Web.Models.ViewModels.Category;
 using TSound.Web.Models.ViewModels.Playlist;
-using TSound.Web.Models.ViewModels.Song;
+using TSound.Web.Models.ViewModels.Track;
 using TSound.Web.Models.ViewModels.User;
 
 namespace TSound.Web.MappingConfiguration
@@ -33,7 +35,7 @@ namespace TSound.Web.MappingConfiguration
             this.CreateMap<PlaylistServiceModel, Playlist>()
                 .ForMember(dest => dest.User, opt => opt.Ignore());
 
-            this.CreateMap<Category, GenreServiceModel>();
+            this.CreateMap<Category, CategoryServiceModel>();
 
             this.CreateMap<SpotifyTrack, Track>()
                 .ForMember(dest => dest.SpotifyCategoryId, opt => opt.MapFrom(src => src.SpotifyCategoryId))
@@ -57,7 +59,7 @@ namespace TSound.Web.MappingConfiguration
 
             this.CreateMap<User, UserServiceModel>().ReverseMap();
 
-            this.CreateMap<Track, SongServiceModel>()
+            this.CreateMap<Track, TrackServiceModel>()
                 .ForMember(dest => dest.Album, opt => opt.MapFrom(src => src.Album.Name))
                 .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Artist.Name))
                 .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Category.Name))
@@ -65,8 +67,8 @@ namespace TSound.Web.MappingConfiguration
 
             this.CreateMap<Artist, ArtistServiceModel>();
 
-            this.CreateMap<GenreServiceModel, GenreViewModel>().ReverseMap();
-            this.CreateMap<GenreServiceModel, GenreFullViewModel>().ReverseMap();
+            this.CreateMap<CategoryServiceModel, CategoryViewModel>().ReverseMap();
+            this.CreateMap<CategoryServiceModel, CategoryFullViewModel>().ReverseMap();
 
             this.CreateMap<PlaylistServiceModel, PlaylistViewModel>()
                 .ForMember(dest => dest.SongsCount, opt => opt.MapFrom(src => src.Tracks.Count()))
@@ -76,14 +78,17 @@ namespace TSound.Web.MappingConfiguration
                 .ForMember(dest => dest.CategoriesCount, opt => opt.MapFrom(src => src.CategoriesCount))
                 .ReverseMap();
 
-            this.CreateMap<SongServiceModel, SongViewModel>().ReverseMap();
-            this.CreateMap<SongServiceModel, SongLightViewModel>().ReverseMap();
+            this.CreateMap<TrackServiceModel, TrackViewModel>().ReverseMap();
+            this.CreateMap<TrackServiceModel, TrackLightViewModel>().ReverseMap();
 
             this.CreateMap<AlbumServiceModel, AlbumViewModel>().ReverseMap();
 
             this.CreateMap<ArtistServiceModel, ArtistViewModel>().ReverseMap();
 
             this.CreateMap<UserServiceModel, UserViewModel>().ReverseMap();
+
+            this.CreateMap<NewsServiceModel, NewsViewModel>()
+                .ForMember(dest => dest.Publisher, opt => opt.MapFrom(src => src.Publisher.Name));
         }
     }
 }

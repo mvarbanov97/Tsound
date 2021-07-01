@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TSound.Web.Models.ViewModels.Category;
-using TSound.Web.Models.ViewModels.Track;
+using TSound.Web.Models.Contracts;
 
 namespace TSound.Web.Models.ViewModels.Playlist
 {
-    public class PlaylistViewModel
+    public class PlaylistLightViewModel : IDeletable
     {
         public Guid Id { get; set; }
-
-        public string SpotifyId { get; set; }
 
         public string Name { get; set; }
 
@@ -23,7 +20,7 @@ namespace TSound.Web.Models.ViewModels.Playlist
 
         public string Image { get; set; }
 
-        public int Rank { get; set; }
+        public double Rank { get; set; }
 
         public int DurationPlaylist { get; set; }
 
@@ -33,7 +30,7 @@ namespace TSound.Web.Models.ViewModels.Playlist
 
         public bool IsUnlisted { get; set; }
 
-        public int GenresCount { get; set; }
+        public int CategoriesCount { get; set; }
 
         public int SongsCount { get; set; }
 
@@ -41,9 +38,10 @@ namespace TSound.Web.Models.ViewModels.Playlist
         public string UserName { get; set; }
         public string UserImageUrl { get; set; }
 
-        public IEnumerable<TrackLightViewModel> SongsTop3 { get; set; }
+        public string NameController { get; set; }
 
-        public IEnumerable<CategoryFullViewModel> Genres { get; set; }
+        public bool IsToBeDeletedByAdmin { get; set; }
 
+        public int CurrentPage { get; set; }
     }
 }
