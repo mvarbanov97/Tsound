@@ -30,6 +30,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TSound.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/jquery/dist/jquery-ui.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="icon" type="image/x-icon" href="~/images/favicon.ico">
     <script src="https://kit.fontawesome.com/13d3a4aa9f.js" crossorigin="anonymous"></script>
@@ -75,10 +76,10 @@
                                 <p>Users</p>
                             </a>
                         </li>
-                        <li class="@(title.ToLowerInvariant() == "genres / all" ? "active" : "")">
-                            <a asp-area="" asp-controller="Genres" asp-action="All">
+                        <li class="@(title.ToLowerInvariant() == "categories / all" ? "active" : "")">
+                            <a asp-area="" asp-controller="Category" asp-action="All">
                                 <i class="tim-icons icon-atom"></i>
-                                <p>Genres</p>
+                                <p>Categories</p>
                             </a>
                         </li>
                         <li class="@(title.ToLowerInvariant() == "apiservices / general" ? "active" : "")">
@@ -141,7 +142,7 @@
                                     <li class="dropdown nav-item">
                                         <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                                             <div class="photo">
-                                                <img src="@userCurrent.Image" height="30" id="img-circle" />
+                                                <img src="@userCurrent.ImageUrl" height="30" id="img-circle" />
                                             </div>
                                             <b class="caret d-none d-lg-block d-xl-block"></b>
                                             <p class="d-lg-none">
@@ -214,6 +215,7 @@
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&language=en&key=AIzaSyDhW6Lx8XoW6IqF4r6N8_5LF_CHt8PmyKI"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery-ui.min.js" type="text/javascript"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/template/black-dashboard.js"></script>
     <script src="~/js/template/black-dashboard.min.js"></script>

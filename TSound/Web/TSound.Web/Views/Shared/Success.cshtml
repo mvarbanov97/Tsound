@@ -1,0 +1,14 @@
+﻿@model SuccessViewModel
+
+@{
+    ViewData["Title"] = "Success";
+}
+
+<div class="row text-center">
+    <div class="col md-12 text-center">
+        <p class="display-4">You successfully added the item!</p>
+        <img src="~/images/success.gif" width="750" />
+        <br /><br />
+        <a href="@Model.urlGeneral" class="btn btn-lg btn-outline-info">Go back</a>&nbsp;&nbsp;<a href="@Model.urlItemCreated" class="btn btn-lg btn-success">Go to Item</a>
+    </div>
+</div>
