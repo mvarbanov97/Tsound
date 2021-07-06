@@ -25,7 +25,7 @@ namespace TSound.Web.Models.ViewModels.Playlist
 
         public int RankMaxFilter { get; set; }
 
-        public List<CategoryFullViewModel> Genres { get; set; }
+        public List<CategoryFullViewModel> Categories { get; set; }
 
         public List<Guid> GenresIdChosenByUserFilter { get; set; }
 

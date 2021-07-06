@@ -1,0 +1,43 @@
+﻿@model CollectionCategoriesFullViewModel
+
+@{
+    ViewData["Title"] = "All categories";
+}
+
+<div class="row">
+    <div class="col-md-1">
+
+    </div>
+
+    <div class="col-md-10">
+        <div class="row">
+            @foreach (var item in Model.Collection)
+            {
+                var currentCategoryForPlaylistModel = new List<CategoryFullViewModel>();
+                currentCategoryForPlaylistModel.Add(item);
+                var currentPlaylistModel = new AllPlaylistsViewModel { Categories = currentCategoryForPlaylistModel };
+                <div class="col-md-3">
+                    <div class="card text-center" onclick="window.location='@Url.Action("All", "Playlists", new { input = currentPlaylistModel })'">
+                        <br />
+                        <br />
+                        <div class="card-img-top">
+                            <img class="rounded-circle" src="@item.ImageUrl" />
+                        </div>
+                        <div class="card-body">
+                            <h3>
+                                @item.Name
+                            </h3>
+                            <input href="@Url.Action("All", "Playlists", new { input = currentPlaylistModel })" value="View Playlists" id="view-genre-playlists-btn" class="btn btn-primary btn-round">
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-1">
+
+    </div>
+
+</div>
