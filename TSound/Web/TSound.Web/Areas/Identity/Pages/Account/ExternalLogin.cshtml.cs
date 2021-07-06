@@ -15,8 +15,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using TSound.Data.Models;
+using TSound.Data.UnitOfWork;
 using TSound.Services.Contracts;
-using TSound.Services.External.SpotifyAuthorization;
 
 namespace TSound.Web.Areas.Identity.Pages.Account
 {
@@ -28,19 +28,22 @@ namespace TSound.Web.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
         private readonly IUserService _userService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ExternalLoginModel(
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IUserService userService)
+            IUserService userService,
+            IUnitOfWork unitOfWork)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
             _userService = userService;
+            _unitOfWork = unitOfWork;
         }
 
         [BindProperty]
@@ -74,10 +77,6 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
 
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-
-            await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
-
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
@@ -88,11 +87,20 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
+
+            // update profile picture Url as it expires every week
+            var userId = _unitOfWork.UserLogins.All().Where(x => x.ProviderKey == info.ProviderKey).Select(x => x.UserId).FirstOrDefault();
+            var user = _unitOfWork.Users.All().FirstOrDefault(x => x.Id == userId);
+
+            user.ImageUrl = info.Principal.Claims.Where(x => x.Type == "urn:spotify:profilepicture").Select(x => x.Value).FirstOrDefault();
+
+            _unitOfWork.Users.Update(user);
+            await _unitOfWork.CompleteAsync();
 
             if (info == null)
             {
@@ -101,7 +109,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (result.Succeeded)
             {
@@ -145,7 +153,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
                 var spotifyDetails = await _userService.GetSpotifyUser(info.ProviderKey, accessToken);
                 var fullName = spotifyDetails.DisplayName.Split(' ');
 
-                var user = new User { UserName = Input.Email, Email = Input.Email, DateCreated = DateTime.UtcNow, ImageUrl = spotifyDetails.Images[0].Url, FirstName = fullName[0], LastName = fullName[1] };
+                var user = new User { UserName = Input.Email, Email = Input.Email, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow, ImageUrl = spotifyDetails.Images[0].Url, FirstName = fullName[0], LastName = fullName[1] };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
