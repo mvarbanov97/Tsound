@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Services.Models;
-using static TSound.Data.Models.SpotifyDomainModels.SpotifyPlaylistModel;
+using static TSound.Plugin.Spotify.WebApi.SpotifyModels.SpotifyPlaylistModel;
 
 namespace TSound.Services.Contracts
 {
@@ -12,7 +11,7 @@ namespace TSound.Services.Contracts
     {
         Task<PlaylistServiceModel> CreatePlaylistAsync(PlaylistServiceModel playlistServiceModel);
 
-        Task AddTracksToPlaylist(Guid playlistId, IEnumerable<SpotifyPlaylistModel.PlaylistTrack> tracks);
+        Task AddTracksToPlaylist(Guid playlistId, IEnumerable<SpotifyPlaylistTrack> tracks);
 
         Task AddCategoriesToPlaylist(Guid playlistId, IEnumerable<string> categories);
 
@@ -24,7 +23,7 @@ namespace TSound.Services.Contracts
 
         Task<IEnumerable<PlaylistServiceModel>> GetPlaylistsByUserIdAsync(Guid userId);
 
-        Task<IEnumerable<PlaylistTrack>> GenerateTracksForPlaylistAsync(int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken);
+        Task<IEnumerable<SpotifyPlaylistTrack>> GenerateTracksForPlaylistAsync(int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken);
 
         Task<bool> UpdatePlaylistDurationTravelAsync(Guid id, int durationTravel);
 

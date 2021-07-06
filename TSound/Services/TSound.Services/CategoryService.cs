@@ -10,11 +10,11 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Data.UnitOfWork;
+using TSound.Plugin.Spotify.WebApi.Authorization;
+using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
-using TSound.Services.External.SpotifyAuthorization;
 using TSound.Services.Models;
 
 namespace TSound.Services

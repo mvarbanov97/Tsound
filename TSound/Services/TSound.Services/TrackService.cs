@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Data.UnitOfWork;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
 using TSound.Services.Models;
+using static TSound.Plugin.Spotify.WebApi.SpotifyModels.SpotifyPlaylistModel;
 
 namespace TSound.Services
 {
@@ -57,7 +57,7 @@ namespace TSound.Services
             return songServiceModels;
         }
 
-        public async Task<IEnumerable<Track>> AddTracksToDbAsync(IEnumerable<SpotifyPlaylistModel.PlaylistTrack> playlistTracks)
+        public async Task<IEnumerable<Track>> AddTracksToDbAsync(IEnumerable<SpotifyPlaylistTrack> playlistTracks)
         {
             var tracks = playlistTracks.Select(x => x.Track).ToList();
 

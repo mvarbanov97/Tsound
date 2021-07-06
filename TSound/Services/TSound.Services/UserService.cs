@@ -9,8 +9,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Data.UnitOfWork;
+using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.Models;
 
@@ -74,7 +74,7 @@ namespace TSound.Services
             return spotifyId;
         }
 
-        public async Task<UserSpotify> GetSpotifyUser(string id, string accessToken)
+        public async Task<SpotifyUser> GetSpotifyUser(string id, string accessToken)
         {
             HttpClient client = new HttpClient();
 
@@ -93,7 +93,7 @@ namespace TSound.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
-                UserSpotify spotifyUserData = JsonConvert.DeserializeObject<UserSpotify>(result);
+                SpotifyUser spotifyUserData = JsonConvert.DeserializeObject<SpotifyUser>(result);
 
                 return spotifyUserData;
             }
@@ -101,7 +101,7 @@ namespace TSound.Services
             return null;
         }
 
-        public async Task<UserSpotify> GetCurrentUserSpotifyProfile(string accessToken)
+        public async Task<SpotifyUser> GetCurrentUserSpotifyProfile(string accessToken)
         {
             HttpClient client = new HttpClient();
 
@@ -116,7 +116,7 @@ namespace TSound.Services
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();
-                UserSpotify spotifyUserData = JsonConvert.DeserializeObject<UserSpotify>(result);
+                SpotifyUser spotifyUserData = JsonConvert.DeserializeObject<SpotifyUser>(result);
 
                 return spotifyUserData;
             }

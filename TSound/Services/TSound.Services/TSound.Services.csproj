@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Data\TSound.Data\TSound.Data.csproj" />
+    <ProjectReference Include="..\..\Plugins\TSound.Plugin.Spotify.WebApi\TSound.Plugin.Spotify.WebApi.csproj" />
     <ProjectReference Include="..\TSound.Services.External\TSound.Services.External.csproj" />
     <ProjectReference Include="..\TSound.Services.Models\TSound.Services.Models.csproj" />
   </ItemGroup>

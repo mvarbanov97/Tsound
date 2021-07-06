@@ -6,20 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Data.UnitOfWork;
+using TSound.Plugin.Spotify.WebApi.Extensions;
+using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
-using TSound.Services.External.Helpers;
-using TSound.Services.External.SpotifyAuthorization;
 using TSound.Services.Models;
-using TSound.Services.Validators;
-using static TSound.Data.Models.SpotifyDomainModels.SpotifyPlaylistModel;
+using static TSound.Plugin.Spotify.WebApi.SpotifyModels.SpotifyPlaylistModel;
 
 namespace TSound.Services
 {
@@ -69,7 +64,7 @@ namespace TSound.Services
             return playlistServiceModel;
         }
 
-        public async Task AddTracksToPlaylist(Guid playlistId, IEnumerable<SpotifyPlaylistModel.PlaylistTrack> tracks)
+        public async Task AddTracksToPlaylist(Guid playlistId, IEnumerable<SpotifyPlaylistTrack> tracks)
         {
             var playlistToUpdate = await this.unitOfWork.Playlists.All().AsNoTracking().FirstOrDefaultAsync(x => x.Id == playlistId);
 
@@ -77,7 +72,7 @@ namespace TSound.Services
             {
                 var trackToAdd = await this.unitOfWork.Tracks.All().AsNoTracking().FirstOrDefaultAsync(x => x.SpotifyId == track.Track.Id);
 
-                await this.unitOfWork.PlaylistTracks.AddAsync(new Data.Models.PlaylistTrack
+                await this.unitOfWork.PlaylistTracks.AddAsync(new PlaylistTrack
                 {
                     PlaylistId = playlistToUpdate.Id,
                     TrackId = trackToAdd.Id
@@ -211,12 +206,12 @@ namespace TSound.Services
             }
         }
 
-        public async Task<IEnumerable<SpotifyPlaylistModel.PlaylistTrack>> GenerateTracksForPlaylistAsync(int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken)
+        public async Task<IEnumerable<SpotifyPlaylistTrack>> GenerateTracksForPlaylistAsync(int durationTravel, IEnumerable<string> categoryIdsToUse, string userAccessToken)
         {
             Random random = new Random();
             int durationDubbedCurrent = 0;
             var trackUrisToAdd = new List<string>(100);
-            var tracks = new List<SpotifyPlaylistModel.PlaylistTrack>();
+            var tracks = new List<SpotifyPlaylistTrack>();
 
             // If for some reason we don't receive any Genres by the User - use all available Genres.
             if (categoryIdsToUse == null || categoryIdsToUse.Count() == 0)
@@ -239,11 +234,12 @@ namespace TSound.Services
                 var randomTracksOfPlaylist = await this.GetPlaylistTracks<PlaylistPaged>(randomPlaylist.Items[0].Id, userAccessToken, null, random.Next(1, 3), random.Next(1, 20));
 
                 var tracksToAdd = randomTracksOfPlaylist.Items.ToList();
+
                 tracksToAdd.Select(x => { x.Track.SpotifyCategoryId = randomCategoryId; return x; }).ToList();
 
                 foreach (var track in tracksToAdd)
                 {
-                    if (!tracks.Contains(track))
+                    if (!tracks.Select(x => x.Track.Name).Contains(track.Track.Name))
                     {
                         tracks.Add(track);
                         durationDubbedCurrent += track.Track.DurationMs;

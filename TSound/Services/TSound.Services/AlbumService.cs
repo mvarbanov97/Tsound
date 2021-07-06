@@ -26,7 +26,7 @@ namespace TSound.Services
 
         public async Task<AlbumServiceModel> GetAlbumByIdAsync(Guid albumId)
         {
-            var album = await this.unitOfWork.Albums.All().Include(a => a.Artist).FirstOrDefaultAsync(a => a.Id == albumId);
+            var album = await this.unitOfWork.Albums.All().Include(a => a.Artists).FirstOrDefaultAsync(a => a.Id == albumId);
 
             if (album == null)
                 throw new ArgumentNullException("Album Not Found.");

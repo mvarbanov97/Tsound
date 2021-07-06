@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
 using TSound.Services.Models;
+using static TSound.Plugin.Spotify.WebApi.SpotifyModels.SpotifyPlaylistModel;
 
 namespace TSound.Services.Contracts
 {
@@ -14,7 +14,7 @@ namespace TSound.Services.Contracts
 
         Task<IEnumerable<TrackServiceModel>> GetAllTracksAsync();
 
-        Task<IEnumerable<Track>> AddTracksToDbAsync(IEnumerable<SpotifyPlaylistModel.PlaylistTrack> tracks);
+        Task<IEnumerable<Track>> AddTracksToDbAsync(IEnumerable<SpotifyPlaylistTrack> tracks);
 
         Task<IEnumerable<TrackServiceModel>> GetTracksByPlaylistIdAsync(Guid playlistId);
 
