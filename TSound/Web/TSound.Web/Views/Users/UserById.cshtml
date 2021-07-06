@@ -1,0 +1,209 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "UserById";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    int numPlaylists = 1;
+    int numGenres = 1;
+
+}
+
+<div class="row">
+    <div class="col-lg-1"></div>
+    <div class="col-lg-5">
+        <div class="card card-user @(Model.IsAdmin ? "border border-success" : "")">
+            <div class="card-body">
+                <p class="card-text">
+                </p><div class="author">
+                    <div class="block block-one"></div>
+                    <div class="block block-two"></div>
+                    <div class="block block-three"></div>
+                    <div class="block block-four"></div>
+                    <a href="@Url.Action("UserById", "Users", new { id = Model.Id })">
+                        <img src="@Model.ImageUrl" class="img-circle-lg" />
+                        <br />
+                        <h3 class="title">@Model.FirstName @Model.LastName</h3>
+                    </a>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-4">
+                            <p class="text-center"><i class="tim-icons icon-calendar-60"></i> Created</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="text-center"><i class="tim-icons icon-calendar-60"></i> Modified</p>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-4">
+                            <p class="text-center">@Model.DateCreated.ToString().Split(" ")[0]</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="text-center">@Model.DateModified.ToString().Split(' ').ToArray()[0]</p>
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                    <div>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="alert alert-danger">
+                                <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                                    <i class="tim-icons icon-simple-remove"></i>
+                                </button>
+                                <span>
+                                    <b>Admins only section</b>
+                                    <hr />
+                                    <b>User Id:</b> @Model.Id<br />
+                                    <b>ApiKey:</b> @Model.ApiKey<br />
+                                    <b>Banned:</b> @Model.IsBanned<br />
+                                    <b>Deleted:</b> @Model.IsDeleted<br />
+                                    <b>Admin:</b> @Model.IsAdmin
+                                </span>
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <br />
+                        <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.PlaylistsCount</button></p>
+                        @if (Model.PlaylistsCount != 0)
+                        {
+                            <table class="table tablesorter " id="table-playlists" style="visibility:collapse">
+                                <thead class=" text-primary">
+                                    <tr>
+                                        <th>
+                                            #
+                                        </th>
+                                        <th>
+                                            Image
+                                        </th>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Songs
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Playlists)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @(numPlaylists++)
+                                            </td>
+                                            <td><a href="@Url.Action("PlaylistById", "Playlists", new { id = item.Id })"><img src="@item.Image" id="img-circle" height="30" /></a></td>
+                                            <td>
+                                                @item.Name
+                                            </td>
+                                            <td>
+                                                @item.SongsCount
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <table id="table-playlists" class="table table-dark table-striped table-bordered text-white" style="visibility:collapse">
+                            </table>
+                        }
+                    </div>
+                    <p></p>
+                    <div class="card-description"></div>
+                </div>
+                <div class="card-footer">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <br />
+                        <div class="text-center">
+                            @{
+                                Model.Name = Model.FirstName = " " + Model.LastName;
+                                Model.IsToBeDeletedByAdmin = false;
+                                Model.NameController = "Users";
+                                Model.CurrentPage = Model.CurrentPage;
+                            }
+                            <partial name="_DeleteModalPartial" model="@Model" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <h3>Most Popular Playlist</h3>
+            <table class="table tablesorter">
+                <thead class=" text-primary">
+                    <tr>
+                        <th>
+                            Image
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Songs
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Playlists != null && Model.Playlists.Count() != 0)
+                    {
+                        <tr>
+                            <td><a href="@Url.Action("PlaylistById", "Playlists", new { id = Model.Playlists.OrderBy(x => x.Rank).First().Id })"><img src="@Model.Playlists.OrderBy(x => x.Rank).First().Image" id="img-circle" height="30" /></a></td>
+                            <td>
+                                @Model.Playlists.OrderBy(x => x.Rank).First().Name
+                            </td>
+                            <td>
+                                @Model.Playlists.OrderBy(x => x.Rank).First().SongsCount
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <table id="table-playlists" class="table table-dark table-striped table-bordered text-white" style="visibility:collapse">
+            </table>
+        </div>
+        <div class="card p-3">
+            <h3>Genres Preferred</h3>
+            @if (Model.CategoriesPreferred != null && Model.CategoriesPreferred.Count() != 0)
+            {
+                <table class="table tablesorter " id="">
+                    <thead class="text-primary">
+                        <tr>
+                            <th>
+                                #
+                            </th>
+                            <th>
+                                Image
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var genre in Model.CategoriesPreferred)
+                        {
+                            <tr>
+                                <td>
+                                    @(numGenres++)
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("PlaylistById", "Playlists", new { id = genre.Id })"><img src="@genre.ImageUrl" id="img-circle" height="30"></a>
+                                </td>
+                                <td>
+                                    @genre.Name
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    <div class="col-lg-1"></div>
+    <br />
+</div>

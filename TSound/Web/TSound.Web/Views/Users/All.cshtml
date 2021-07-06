@@ -1,36 +1,59 @@
-﻿@model UsersCollectionViewModel
+﻿@model CollectionUserFullViewModel
 
-@{ ViewData["Title"] = "All";
-                Layout = "~/Views/Shared/_Layout.cshtml"; }
+@{
+    ViewData["Title"] = "All";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div class="row">
-    <div class="col-md-3">
-    </div>
-    <div class="col-md-6 text-center">
-        <h1>Users</h1>
-    </div>
-    <div class="col-md-3"></div>
-</div>
+@if (Model.LastPage > 0)
+{
+    <partial name="_PageNavigatorPartial" model="@Model" />
+}
+
 
 <div class="row">
     @foreach (var item in Model.Users)
     {
-<div class="col-md-3 border border-warning @(item.IsAdmin ? "bg-info" : String.Empty)" id="div-chamfered-bordered-thick">
-    <div class="text-center">
-        <br />
-        <img src="@item.Image" id="img-circle" height="300" />
-        <br />
-        <br />
-    </div>
-    <p><b>Id:</b> @item.Id</p>
-    <p><b>First Name:</b> @item.FirstName</p>
-    <p><b>Last Name:</b> @item.LastName</p>
-    <hr />
-    <p><b>Date Created:</b> @item.DateCreated</p>
-    <p><b>Date Modified:</b> @item.DateModified</p>
-    <hr />
-    <p><b>Is Deleted:</b> @item.IsDeleted</p>
-    <p><b>Is Unlisted:</b> @item.IsBanned</p>
-    <p><b>Is Admin:</b> @item.IsAdmin</p>
-</div>}
+        <div class="col-lg-3">
+            <div class="card card-user @(item.IsAdmin ? "border border-success" : "")">
+                <div class="card-body">
+                    <p class="card-text">
+                    </p><div class="author">
+                        <div class="block block-one"></div>
+                        <div class="block block-two"></div>
+                        <div class="block block-three"></div>
+                        <div class="block block-four"></div>
+                        <a href="@Url.Action("UserById", "Users", new { id = item.Id })">
+                            <img src="@item.ImageUrl" class="img-circle-lg" height="200" width="400" />
+                            <br />
+                            <h3 class="title">@item.FirstName @item.LastName</h3>
+                        </a>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-4">
+                                <p class="text-center"><i class="tim-icons icon-calendar-60"></i></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-center"><i class="tim-icons icon-headphones"></i></p>
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-4">
+                                <p class="text-center">@item.DateCreated.ToString().Split(" ")[0]</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="text-center">@item.PlaylistsCount</p>
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                    </div>
+                    <p></p>
+                    <div class="card-description"></div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+<br />
