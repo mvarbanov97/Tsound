@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8 border border-primary" id="div-chamfered-bordered-thick">
-            <form asp-controller="Playlists" asp-action="Create" method="post" class="form" enctype="multipart/form-data">
+            <form asp-controller="Playlists" asp-action="Create" method="post" class="form" id="createPlaylistForm" onsubmit="displayBusyIndicator()" enctype="multipart/form-data">
                 <div asp-validation-summary="All" class="text-danger"></div> <!--UL list -->
 
                 <div id="map" style="padding-top:10px"></div>
@@ -57,14 +57,14 @@
                 </div>
 
                 <div class="row">
-                    @for (int i = 0; i < Model.Genres.Count(); i++)
+                    @for (int i = 0; i < Model.Categories.Count(); i++)
                     {
                     <div class="col-4">
-                        <input type="checkbox" asp-for="@Model.Genres[i].IsSelected" />
-                        <label asp-for="@Model.Genres[i].IsSelected">@Model.Genres[i].Name</label>
-                        <input type="hidden" asp-for="@Model.Genres[i].Id" />
-                        <input type="hidden" asp-for="@Model.Genres[i].SpotifyId" />
-                        <input type="hidden" asp-for="@Model.Genres[i].Name" />
+                        <input type="checkbox" asp-for="@Model.Categories[i].IsSelected" />
+                        <label asp-for="@Model.Categories[i].IsSelected">@Model.Categories[i].Name</label>
+                        <input type="hidden" asp-for="@Model.Categories[i].Id" />
+                        <input type="hidden" asp-for="@Model.Categories[i].SpotifyId" />
+                        <input type="hidden" asp-for="@Model.Categories[i].Name" />
                     </div>}
                 </div>
 
@@ -80,6 +80,7 @@
                 <input type="submit" value="Submit" class="btn btn-outline-primary" />
                 <br />
                 <br />
+                <partial name="_LoadingPartial" />
                 <br />
                 <br />
 

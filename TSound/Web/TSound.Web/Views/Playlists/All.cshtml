@@ -1,44 +1,148 @@
-﻿@model PlaylistCollectionViewModel
+﻿@model AllPlaylistsViewModel
 
 @{ ViewData["Title"] = "All";
-                Layout = "~/Views/Shared/_Layout.cshtml"; }
+    Layout = "~/Views/Shared/_Layout.cshtml"; }
 
 <div class="row">
-    <div class="col-md-3">
-        <input type="button" value="Create" onclick="window.location='@Url.Action("Create", "Playlists")'" class="btn btn-primary" />
+    <div class="col-md-3 text-right">
+        <div class="modal modal-search fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form asp-controller="Playlists" asp-action="All" method="post" class="form" enctype="multipart/form-data">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="tim-icons icon-simple-remove"></i>
+                        </button>
+                        <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH" asp-for="NameToSearchForFilter" typeof="text" />
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-6 text-center">
-        <h1>Playlists</h1>
-    </div>
-    <div class="col-md-3"></div>
 </div>
+
+<div class="row flex-space-between">
+    <div id="accordion" role="tablist" aria-multiselectable="true" class="col-md-11  card-collapse">
+        <div class="card card-plain filter-container">
+            <div class="card-header" role="tab" id="headingOne">
+                <a class="collapsed" id="collapsable-link" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Filter Playlists
+
+                    <i class="tim-icons icon-minimal-down"></i>
+                </a>
+            </div>
+
+            <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                <div class="card ">
+                    <form asp-controller="Playlists" asp-action="All" method="post" class="form-inline filter-form" id="filterPlaylistsForm" onsubmit="displayBusyIndicator()" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="text-danger"></div> <!--UL list -->
+
+                        <div class="flex-field">
+                            <div class="flex-field-inner col-md-5">
+                                <label>Duration: </label>
+                                <span id="duration-min-span" class="range-nums"></span> <!--span that hold the value, set on slide action-->
+                                <div id="slider-range-duration" class="col-md-6"></div> <!--slider-->
+                                <span id="duration-max-span" class="range-nums"></span>
+                                <input asp-for="DurationMinHoursFilter" type="text" id="duration-min" hidden> <!--hidden fields to send the values to the BE action-->
+                                <input asp-for="DurationMaxHoursFilter" type="text" id="duration-max" hidden> <!--they are set on slide action-->
+                            </div>
+
+                            <div class="flex-field-inner col-md-7">
+                                <label>Rank: </label>
+                                <span id="rank-min-span" class="range-nums"></span>
+                                <div id="slider-range-rank" class="col-md-7"></div>
+                                <span id="rank-max-span" class="range-nums"></span>
+                                <input asp-for="RankMinFilter" type="text" id="rank-min" hidden>
+                                <input asp-for="RankMaxFilter" type="text" id="rank-max" hidden>
+                            </div>
+                        </div>
+                        <div class="flex-field genre-sort-row">
+                            <div class="row">
+                                @if (Model.Genres != null)
+                                {
+                                     @for (int i = 0; i < Model.Genres.Count(); i++)
+                                     {
+                                             <div class="col-lg-4">
+                                                 <div class="form-check">
+                                                     <label class="form-check-label" asp-for="@Model.Genres[i].IsSelected">
+                                                         <input class="form-check-input" type="checkbox" asp-for="@Model.Genres[i].IsSelected">
+                                                         @Model.Genres[i].Name&nbsp;
+                                                         <span class="form-check-sign">
+                                                             <span class="check"></span>
+                                                         </span>
+                                                     </label>
+                                                 </div>
+                                                 <input type="hidden" asp-for="@Model.Genres[i].Id" />
+                                                 <input type="hidden" asp-for="@Model.Genres[i].Name" />
+                                             </div>
+                                     }}
+                            </div>
+                            <div class="filter-btns">
+                                <div class="btn-group">
+                                    <select asp-for="SortMethod" class="form-control text-dark btn-primary" asp-items="@Html.GetEnumSelectList<SortMethod>()">
+                                        @*<option selected>Sort</option>*@
+                                    </select>
+                                    <span asp-validation-for="SortMethod" class="text-danger"></span>
+                                </div>
+
+                                <div class="btn-group">
+                                    <select asp-for="SortOrder" class="form-control text-dark btn-primary" asp-items="@Html.GetEnumSelectList<SortOrder>()">
+                                        @*<option selected>Order</option>*@
+                                    </select>
+                                    <span asp-validation-for="SortOrder" class="text-danger"></span>
+                                </div>
+
+                                <input type="submit" value="Filter" class="btn btn-outline-info" />
+                            </div>
+                        </div>
+                        <partial name="_LoadingPartial" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-1 text-center border-left border-primary search-btn">
+        <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal">
+            <h3><i class="tim-icons icon-zoom-split"></i></h3>
+            <span class="d-lg-none d-md-block">Search</span>
+        </button>
+    </div>
+</div>
+<br />
+
+
+@if (Model.CurrentPage != 0 && Model.LastPage != Int32.MinValue)
+{
+<partial name="_PageNavigatorPartial" model="@Model" />
+}
 
 <div class="row">
     @foreach (var item in Model.CollectionPlaylists)
     {
-<div class="col-md-3 border border-warning" id="div-chamfered-bordered-thick">
-    <div class="text-center">
+<div class="col-lg-4">
+    <div class="card p-3">
+        <h4 class="text-center">@item.Name</h4>
+        <div class="text-center">
+            <a href="@Url.Action("PlaylistById", "Playlists", new { id = item.Id })">
+                <img src="@item.Image" class="img-circle-lg" />
+            </a>
+        </div>
+        <p class="text-right">@item.UserName <a href="@Url.Action("UserById", "Users", new { id = item.UserId })"><img src="@item.UserImageUrl" height="40" id="img-circle" /></a></p>
         <br />
-        <img src="@item.Image" id="img-circle" height="300" />
+        <p class="text-center">@item.Description</p>
         <br />
+        <p class="text-center"><b><i class="tim-icons icon-calendar-60"></i> Created:</b> @item.DateCreated.ToString().Split(' ').ToArray()[0]</p>
+        <br />
+        <div class="row text-center">
+            <div class="col-md-4 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
+            <div class="col-md-4 text-center"><p>Genres</p></div>
+            <div class="col-md-4 text-center"><p>Songs</p></div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4 text-center"><p>@((item.DurationTravel / 1000) / 60) min</p></div>
+            <div class="col-md-4 text-center"><p>@item.CategoriesCount</p></div>
+            <div class="col-md-4 text-center"><p>@item.SongsCount</p></div>
+        </div>
         <br />
     </div>
-    <p><b>Id:</b> @item.Id</p>
-    <p><b>Name:</b> @item.Name</p>
-    <p><b>Description:</b> @item.Description</p>
-    <hr />
-    <p><b>Date Created:</b> @item.DateCreated</p>
-    <p><b>Date Modified:</b> @item.DateModified</p>
-    <hr />
-    <p><b>Duration Playlist:</b> ~@(item.DurationPlaylist / 60) minutes</p>
-    <p><b>Duration Travel:</b> ~@(item.DurationTravel / 60) minutes</p>
-    <p><b>Rank:</b> @item.Rank</p>
-    <hr />
-    <p><b>Is Deleted:</b> @item.IsDeleted</p>
-    <p><b>Is Unlisted:</b> @item.IsUnlisted</p>
-    <hr />
-    <p><b>User Id:</b> @item.UserId</p>
-    <p><b>User Name:</b> @item.UserName</p>
-    <p><b>User Image:</b> <img src="@item.UserImage" height="50" /></p>
 </div>}
 </div>

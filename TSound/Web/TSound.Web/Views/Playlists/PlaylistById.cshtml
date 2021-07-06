@@ -1,0 +1,118 @@
+﻿@model PlaylistViewModel
+@{ 
+    ViewData["Title"] = "PlaylistById";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{ 
+    int numSongs = 1;
+    int numGenres = 1;
+    int numSimilarPlaylists = 1;
+    int numSongsTop3 = 1;
+}
+
+<div class="row">
+    <div class="col-lg-1"></div>
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <p class="h2 text-center">@Model.Name</p>
+            <div class="text-center">
+                <a href="@Url.Action("PlaylistById", "Playlists", new { id = Model.Id })">
+                    <img src="@Model.Image" id="img-circle" height="300" />
+                </a>
+            </div>
+            <p class="text-right">@Model.UserName <a href="@Url.Action("UserById", "Users", new { id = Model.Id })"><img src="@Model.UserImageUrl" height="40" id="img-circle" /></a></p>
+            <br />
+            <p class="text-center"><i>@Model.Description</i></p>
+            <br />
+            <p class="text-center"><b><i class="tim-icons icon-calendar-60"></i> Created: </b> @Model.DateCreated.ToString().Split(' ').ToArray()[0]</p>
+            <br />
+            <div class="row text-center">
+                <div class="col-md-4 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
+                <div class="col-md-4 text-center"><p>Genres</p></div>
+                <div class="col-md-4 text-center"><p>Songs</p></div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-4 text-center"><p>@((Model.DurationTravel / 1000) / 60) min</p></div>
+                <div class="col-md-4 text-center"><p>@Model.Genres.Count()</p></div>
+                <div class="col-md-4 text-center"><p>@Model.SongsCount</p></div>
+            </div>
+
+            @*TODO: ADD some bootstrap element when user is in admin role (showing additional info)*@
+            <br />
+            <p class="text-center">
+                <button onclick="expandList(`table-genres`)" class="btn btn-round btn-primary">
+                    <i class="tim-icons icon-atom"></i> Genres <i class="tim-icons icon-minimal-down"></i>
+                </button>
+            </p>
+            <table id="table-genres" class="table table-dark table-striped table-bordered text-white" style="visibility:collapse">
+                <tr>
+                    <th style="width:5%;">#</th>
+                    <th>Genre</th>
+                </tr>
+                @foreach (var genre in Model.Genres)
+                {
+                    var currentGenreForPlaylistModel = new List<CategoryFullViewModel>();
+                    currentGenreForPlaylistModel.Add(genre);
+                    // Add View Model for playlist LIGHT
+                    var currentPlaylistModel = new AllPlaylistsViewModel { Categories = currentGenreForPlaylistModel };
+                    <tr>
+                        <td>@(numGenres++)</td>
+                        <td>
+                            <a href="@Url.Action("All", "Playlists", new {input = currentPlaylistModel})"><img src="@genre.ImageUrl" id="img-circle" height="30" /></a>
+                            <a class="text-white" href="@Url.Action("All", "Playlists", new { input = currentPlaylistModel })">
+                                @genre.Name
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </table>
+
+            <br />
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card p-3">
+            <h3 class="text-center">Listen to the Playlist</h3>
+            <h4 class="text-center">
+                <iframe src="https://open.spotify.com/embed/playlist/@Model.SpotifyId" width="400" height="470" frameborder="1" allowtransparency="true" allow="encrypted-media"></iframe>
+            </h4>
+        </div>
+        <div class="card p-3">
+            <h3>Top 3 Songs</h3>
+            <table class="table tablesorter " id="">
+                <thead class="text-primary">
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th class="text-center">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var song in Model.SongsTop3)
+                    {
+                        <tr>
+                            <td>
+                                @(numSongsTop3++)
+                            </td>
+                            <td>
+                                <a class="text-white" target="_blank" href="@song.PreviewUrl"><b>@song.Name</b> by @song.Artist</a>
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-primary play-button" id="@song.SpotifyId-top" onClick="play(this.id);">
+                                    <i class="tim-icons icon-triangle-right-17"></i>
+                                </button>
+                                <audio id="audio-@song.SpotifyId-top" src="@song.PreviewUrl"></audio>
+                            </td>s
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

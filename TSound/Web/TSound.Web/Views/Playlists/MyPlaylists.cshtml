@@ -1,0 +1,48 @@
+﻿@model AllPlaylistsViewModel
+
+@{
+    ViewData["Title"] = "MyPlaylists";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <input type="button" value="Create a Playlist for your Travel!" onclick="window.location='@Url.Action("Create", "Playlists")'" class="btn btn-lg btn-primary btn-round" /><br /><br />
+    </div>
+</div>
+
+@foreach (var item in Model.CollectionPlaylists)
+{
+    <div class="row">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            <div class="card p-3">
+                <h4 class="text-center">@item.Name</h4>
+                <div class="text-center">
+                    <a href="@Url.Action("PlaylistById", "Playlists", new { id = item.Id })">
+                        <img src="@item.Image" class="img-circle-lg" />
+                    </a>
+                </div>
+                <p class="text-right">@item.UserName <a href="@Url.Action("UserById", "Users", new { id = item.UserId })"><img src="@item.UserImageUrl" height="40" id="img-circle" /></a></p>
+                <br />
+                <p class="text-center">@item.Description</p>
+                <br />
+                <p class="text-center"><b><i class="tim-icons icon-calendar-60"></i> Created:</b> @item.DateCreated.ToString().Split(' ').ToArray()[0]</p>
+                <br />
+                <br />
+                <div class="row text-center">
+                    <div class="col-md-4 text-center"><p><i class="tim-icons icon-time-alarm"></i></p></div>
+                    <div class="col-md-4 text-center"><p>Genres</p></div>
+                    <div class="col-md-4 text-center"><p>Tracks</p></div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-md-4 text-center"><p>@((item.DurationTravel / 1000) / 60) min</p></div>
+                    <div class="col-md-4 text-center"><p>@item.CategoriesCount</p></div>
+                    <div class="col-md-4 text-center"><p>@item.SongsCount</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <br />
+}
