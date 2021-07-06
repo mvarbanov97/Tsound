@@ -19,13 +19,14 @@ using TSound.Services;
 using TSound.Services.Contracts;
 using TSound.Web.MappingConfiguration;
 using TSound.Services.Providers;
-using TSound.Services.External.Spotify;
 using TSound.Data.Seeder.Seeding;
 using System.Web.Http;
 using TSound.Services.External;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authentication;
-using TSound.Services.External.SpotifyAuthorization;
+using TSound.Plugin.Spotify.WebApi.Authorization;
+using TSound.Plugin.Spotify.WebApi;
+using TSound.Plugin.Spotify.WebApi.Contracts;
 
 namespace TSound.Web
 {
@@ -78,7 +79,7 @@ namespace TSound.Web
 
 
             // Cloudinary Authentication
-            var cloudinaryAccount = new CloudinaryDotNet.Account(
+            var cloudinaryAccount = new Account(
                 this.Configuration["Cloudinary:CloudName"],
                 this.Configuration["Cloudinary:ApiKey"],
                 this.Configuration["Cloudinary:ApiSecret"]);
@@ -86,27 +87,34 @@ namespace TSound.Web
             services.AddSingleton(cloudinary);
 
             // Register Logic Services
+            services.AddHttpClient("TSoundCient", c =>
+            {
+                c.Timeout = new TimeSpan(4, 0, 0);
+                c.DefaultRequestHeaders.Accept.Clear();
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             services.AddSingleton<HttpClient>(new HttpClient());
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             services.AddTransient<IPlaylistService, PlaylistService>();
-            services.AddTransient<ISongService, SongService>();
-            services.AddTransient<IGenreService, GenreService>();
+            services.AddTransient<ITrackService, TrackService>();
+            services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAlbumService, AlbumService>();
             services.AddTransient<IArtistService, ArtistService>();
+            services.AddTransient<IHomeService, HomeService>();
 
-            services.AddScoped<ISpotifyAuthService, SpotifyAuthService>();
             services.AddTransient<IUserAccountsService, UserAccountsService>();
             services.AddTransient<IAccountsService, AccountsService>();
+            services.AddTransient<IPlaylistApi, PlaylistApi>();
 
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient<IApplicationCloudinary, ApplicationCloudinary>();
 
             services.AddControllersAsServices(typeof(Startup).Assembly.GetExportedTypes()
                 .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
                 .Where(t => typeof(ApiController).IsAssignableFrom(t)
-                    || t.Name.EndsWith("Controller", StringComparison.OrdinalIgnoreCase)));
+                    || t.Name.EndsWith("Api", StringComparison.OrdinalIgnoreCase)));
 
             services.AddHttpClient();
 
