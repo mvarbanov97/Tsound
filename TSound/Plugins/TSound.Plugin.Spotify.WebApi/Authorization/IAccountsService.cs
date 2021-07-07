@@ -41,7 +41,8 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
     /// Defines a Spotify Accounts Service for the Client Credentials (App) Flow.
     /// </summary>
     /// <remarks>https://developer.spotify.com/documentation/general/guides/authorization-guide/#client-credentials-flow</remarks>
-    public interface IAccountsService : IAccessTokenProvider
+    public interface IAccountsService
     {
+        Task<string> GetAccessToken();
     }
 }

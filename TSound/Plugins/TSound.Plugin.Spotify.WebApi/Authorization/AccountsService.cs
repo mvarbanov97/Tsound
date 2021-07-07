@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -18,7 +16,6 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
 
         protected readonly HttpClient _http;
         protected readonly IConfiguration _config;
-        protected readonly IBearerTokenStore _bearerTokenStore;
         protected readonly IUnitOfWork _unitOfWork;
 
         #region constructors
@@ -27,9 +24,9 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
         /// Instantiates an AccountsService class.
         /// </summary>
         /// <param name="httpClient">An instance of <see cref="HttpClient"/> for making HTTP calls to the Spotify Accounts Service.</param>
-        /// <param name="configuration">An instance of <see cref="IConfiguration"/> for providing Configuration.</param>
+        /// <param name="configuration">An instance of <see cref="IConfiguration"/> fsor providing Configuration.</param>
         /// <param name="bearerTokenStore">An instance of <see cref="IBearerTokenStore"/> for storing cached Access (Bearer) tokens.</param>
-        public AccountsService(HttpClient httpClient, IConfiguration configuration, IBearerTokenStore bearerTokenStore, IUnitOfWork unitOfWork)
+        public AccountsService(HttpClient httpClient, IConfiguration configuration, IUnitOfWork unitOfWork)
         {
             if (httpClient == null) throw new ArgumentNullException("httpClient");
             _http = httpClient;
@@ -41,27 +38,26 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
 
             ValidateConfig();
 
-            _bearerTokenStore = bearerTokenStore ?? new MemoryBearerTokenStore();
             _unitOfWork = unitOfWork;
         }
 
         /// <summary>
         /// Instantiates an AccountsService class.
         /// </summary>
-        public AccountsService() : this(new HttpClient(), null, null, null) { }
+        public AccountsService() : this(new HttpClient(), null, null) { }
 
         /// <summary>
         /// Instantiates an AccountsService class.
         /// </summary>
         /// <param name="httpClient">An instance of <see cref="HttpClient"/> for making HTTP calls to the Spotify Accounts Service.</param>
-        public AccountsService(HttpClient httpClient) : this(httpClient, null, null, null) { }
+        public AccountsService(HttpClient httpClient) : this(httpClient, null, null) { }
 
         /// <summary>
         /// Instantiates an AccountsService class.
         /// </summary>
         /// <param name="httpClient">An instance of <see cref="HttpClient"/> for making HTTP calls to the Spotify Accounts Service.</param>
         /// <param name="configuration">An instance of <see cref="IConfiguration"/> for providing Configuration.</param>
-        public AccountsService(HttpClient httpClient, IConfiguration configuration) : this(httpClient, configuration, null, null) { }
+        public AccountsService(HttpClient httpClient, IConfiguration configuration) : this(httpClient, configuration, null) { }
 
         #endregion
 
@@ -77,11 +73,7 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
 
         protected async Task<BearerAccessToken> GetAccessToken(string tokenKey, string body)
         {
-            var token = await _bearerTokenStore.Get(tokenKey);
-
-            // if token current, return it
             var now = DateTime.UtcNow;
-            if (token != null && token.Expires != null && token.Expires > now) return token;
 
             string json = await _http.Post(new Uri(TokenUrl), body, GetHeader(_config));
 
@@ -92,7 +84,6 @@ namespace TSound.Plugin.Spotify.WebApi.Authorization
 
             // add to store
             newToken.EnforceInvariants();
-            await _bearerTokenStore.InsertOrReplace(tokenKey, newToken);
             return newToken;
         }
 
