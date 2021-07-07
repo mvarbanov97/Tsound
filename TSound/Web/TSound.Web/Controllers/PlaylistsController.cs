@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,85 +7,120 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Common;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
-using TSound.Data.UnitOfWork;
+using TSound.Plugin.Spotify.WebApi;
+using TSound.Plugin.Spotify.WebApi.Authorization;
+using TSound.Plugin.Spotify.WebApi.Contracts;
+using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.External;
-using TSound.Services.External.SpotifyAuthorization;
 using TSound.Services.Models;
-using TSound.Web.ApiControllers;
 using TSound.Web.Models;
-using TSound.Web.Models.ViewModels;
-using TSound.Web.Models.ViewModels.Genre;
+using TSound.Web.Models.ViewModels.Category;
 using TSound.Web.Models.ViewModels.Playlist;
-using static TSound.Data.Models.SpotifyDomainModels.SpotifyPlaylistModel;
+using TSound.Web.Models.ViewModels.Track;
+using static TSound.Plugin.Spotify.WebApi.SpotifyModels.SpotifyPlaylistModel;
 
 namespace TSound.Web.Controllers
 {
     public class PlaylistsController : Controller
     {
-        private readonly SpotifyPlaylistApiController spotifyPlaylistApi;
         private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
+        private readonly IPlaylistApi spotifyPlaylistApi;
         private readonly IPlaylistService playlistService;
         private readonly IUserService usersService;
-        private readonly IGenreService genreService;
+        private readonly ICategoryService categoryService;
+        private readonly ITrackService trackService;
         private readonly IMapper mapper;
-        private readonly IUnitOfWork unitOfWork;
-        private readonly ISpotifyAuthService spotifyAuthService;
+        private readonly IUserAccountsService userAccountsService;
         private readonly IApplicationCloudinary applicationCloudinary;
 
         public PlaylistsController(
             UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            IPlaylistApi spotifyPlaylistApi,
             IPlaylistService playlistService,
             IUserService usersService,
-            IGenreService genreService,
-            IMapper mapper, SpotifyPlaylistApiController spotifyPlaylistApi, IUnitOfWork unitOfWork, ISpotifyAuthService spotifyAuthService, IUserService userService, IApplicationCloudinary applicationCloudinary)
+            ICategoryService genreService,
+            ITrackService songService,
+            IMapper mapper,
+            IUserAccountsService userAccountsService,
+            IApplicationCloudinary applicationCloudinary)
         {
             this.userManager = userManager;
+            this.signInManager = signInManager;
             this.playlistService = playlistService;
             this.usersService = usersService;
-            this.genreService = genreService;
+            this.categoryService = genreService;
+            this.trackService = songService;
             this.mapper = mapper;
             this.spotifyPlaylistApi = spotifyPlaylistApi;
-            this.unitOfWork = unitOfWork;
-            this.spotifyAuthService = spotifyAuthService;
+            this.userAccountsService = userAccountsService;
             this.applicationCloudinary = applicationCloudinary;
         }
 
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All(int page = 1)
         {
-            var collectionPlaylistsServiceModels = await playlistService.GetAllPlaylistsAsync();
+            int pageCountSize = 12;
 
-            PlaylistCollectionViewModel model = new PlaylistCollectionViewModel();
-            model.CollectionPlaylists = collectionPlaylistsServiceModels.Select(x => new PlaylistViewModel
-            {
-                Id = x.Id,
-                Name = x.Name,
-                DateCreated = x.DateCreated,
-                DateModified = x.DateModified,
-                Description = x.Description,
-                DurationPlaylist = x.DurationPlaylist,
-                DurationTravel = x.DurationTravel,
-                Image = x.Image,
-                Rank = x.Rank,
-                IsUnlisted = x.IsUnlisted,
-                IsDeleted = x.IsDeleted,
-                UserId = x.UserId,
-                UserName = x.UserName,
-                UserImage = x.UserImage,
-            });
+            IEnumerable<PlaylistServiceModel> collectionPlaylistsServiceModels = await playlistService.GetAllPlaylistsAsync(false, null, false);
+
+            int totalCount = collectionPlaylistsServiceModels.Count();
+
+            var collectionPlaylistsServiceModelsByPage = collectionPlaylistsServiceModels
+                .OrderByDescending(x => x.Rank)
+                .Skip((page - 1) * pageCountSize)
+                .Take(pageCountSize);
+
+            AllPlaylistsViewModel model = new AllPlaylistsViewModel();
+            model.CollectionPlaylists = this.mapper.Map<IEnumerable<PlaylistLightViewModel>>(collectionPlaylistsServiceModelsByPage);
+
+            model.Url = "/Playlists/All";
+            model.PageSize = pageCountSize;
+            model.CurrentPage = page;
+            model.TotalCount = totalCount;
+
+            var catgoryServiceModels = await categoryService.GetAllCategoriesAsync(false, null);
+            model.Categories = this.mapper.Map<IEnumerable<CategoryFullViewModel>>(catgoryServiceModels).ToList();
+
+            return this.View(model);
+        }
+
+        public async Task<IActionResult> MyPlaylists(string email)
+        {
+            var user = await this.usersService.GetUserByEmailAsync(email);
+            var collectionPlaylistsByUserId = await playlistService.GetPlaylistsByUserIdAsync(user.Id);
+            AllPlaylistsViewModel model = new AllPlaylistsViewModel();
+            model.CollectionPlaylists = this.mapper.Map<IEnumerable<PlaylistLightViewModel>>(collectionPlaylistsByUserId);
+
+            return this.View(model);
+        }
+
+        public async Task<IActionResult> PlaylistById(Guid id)
+        {
+            var playlistServiceModel = await playlistService.GetPlaylistByIdAsync(id);
+
+            var categories = await this.categoryService.GetCategoryByPlaylistIdAsync(playlistServiceModel.Id);
+            var tracks = await this.trackService.GetTracksByPlaylistIdAsync(id);
+
+            var playlistAll = await playlistService.GetAllPlaylistsAsync();
+
+            var model = this.mapper.Map<PlaylistViewModel>(playlistServiceModel);
+
+            model.Genres = this.mapper.Map<IEnumerable<CategoryFullViewModel>>(categories);
+            model.SongsTop3 = this.mapper.Map<IEnumerable<TrackLightViewModel>>(tracks.OrderBy(s => s.Popularity).Take(3));
 
             return this.View(model);
         }
 
         public async Task<IActionResult> Create()
         {
-            var genresServiceModels = await this.genreService.GetAllGenresAsync(false, null);
-            var genreViewModels = this.mapper.Map<IEnumerable<GenreFullViewModel>>(genresServiceModels).ToList();
+            var categoriesServiceModels = await this.categoryService.GetAllCategoriesAsync(false, null);
+            var categoryViewModel = this.mapper.Map<IEnumerable<CategoryFullViewModel>>(categoriesServiceModels).ToList();
 
             PlaylistCreateFormInputModel model = new PlaylistCreateFormInputModel
             {
-                Genres = genreViewModels,
+                Categories = categoryViewModel,
             };
 
             return await Task.Run(() => View(model));
@@ -102,16 +135,35 @@ namespace TSound.Web.Controllers
             }
 
             var currentUser = await this.userManager.GetUserAsync(this.User);
-            var userRefreshToken = await this.spotifyAuthService.GetUserRefreshToken(currentUser.Id);
 
-            await this.spotifyAuthService.GenerateRefreshRequestBody(currentUser.Id);
+            // Check if user has logged in with External Provider (Spotify)
+            var logins = await this.signInManager.UserManager.GetLoginsAsync(currentUser);
+            // if (logins == null)
+                // Crate playlist with tracks that are seeded in the Db
 
-            var userAccessToken = await this.spotifyAuthService.GetUserAccessToken(currentUser.Id);
+            // Access token expires every 1 hour so we need Refresh token in order to enquire new one
+            var refreshToken = await this.userAccountsService.GetRefreshTokenFromDb(currentUser.Id);
+            var token = await this.userAccountsService.RefreshUserAccessToken(refreshToken);
 
-            var spotifyId = this.unitOfWork.UserLogins.All().Where(x => x.UserId == currentUser.Id).Select(x => x.ProviderKey).FirstOrDefault();
-            var spotifyUser = await this.usersService.GetSpotifyUser(spotifyId, userAccessToken);
+            var spotifyUser = await this.usersService.GetCurrentUserSpotifyProfile(token.AccessToken);
 
-            var details = new PlaylistDetails { Name = input.Name, Description = input.Description, Public = true};
+            var details = new PlaylistDetails { Name = input.Name, Description = input.Description, Public = true };
+
+            // Creates the playlist using the Spotify Api
+            var spotifyPlaylist = await this.spotifyPlaylistApi.CreatePlaylist<SpotifyPlaylist>(spotifyUser.Id, details, token.AccessToken);
+
+            // Fetch random tracks from Spotify Playlist API with user selected categories
+            var categoryIdsChoosenByUser = input.Categories.Where(x => x.IsSelected == true).Select(y => y.SpotifyId);
+            var tracks = await this.playlistService.GenerateTracksForPlaylistAsync(input.DurationMS, categoryIdsChoosenByUser, token.AccessToken);
+
+            await this.trackService.AddTracksToDbAsync(tracks);
+
+            // Add tracks to Spotify Playlist   
+            var trackUris = tracks.Select(x => x.Track.Uri).ToArray();
+            await this.spotifyPlaylistApi.AddItemsToPlaylist(spotifyPlaylist.Id, trackUris, null, token.AccessToken);
+
+            // Get the auto generated Cover Image
+            var image = await this.spotifyPlaylistApi.GetPlaylistCoverImage(spotifyPlaylist.Id, token.AccessToken);
 
             PlaylistServiceModel playlistToCreate = new PlaylistServiceModel
             {
@@ -119,28 +171,23 @@ namespace TSound.Web.Controllers
                 Description = input.Description,
                 UserId = currentUser.Id,
                 UserName = currentUser.FirstName + " " + currentUser.LastName,
-                UserImage = currentUser.ImageUrl,
+                UserImageUrl = currentUser.ImageUrl,
                 DurationTravel = input.DurationMS,
+                SpotifyId = spotifyPlaylist.Id,
+                Image = image[0].Url
             };
-
-            // Creates the playlist on Spotify server
-            var spotifyPlaylist = await this.spotifyPlaylistApi.CreatePlaylist<SpotifyPlaylist>(spotifyUser.Id, details, userAccessToken);
-            playlistToCreate.SpotifyId = spotifyPlaylist.Id;
 
             // Save the playlist into the Db
             var playlistCreated = await this.playlistService.CreatePlaylistAsync(playlistToCreate);
+            await this.playlistService.AddTracksToPlaylist(playlistCreated.Id, tracks);
 
             // Upload Playlist Image to Cloudinary
-            await this.applicationCloudinary.UploadImageAsync(
-                input.ImageFile,
-                string.Format(GlobalConstants.CloudinaryPlaylistPictureName, playlistCreated.Id));
-            
-            var genresIdsChosenByUser = input.Genres.Where(x => x.IsSelected == true).Select(y => y.SpotifyId);
+            if (input.ImageFile != null)
+                await this.applicationCloudinary.UploadImageAsync(
+                    input.ImageFile,
+                    string.Format(GlobalConstants.CloudinaryPlaylistPictureName, playlistCreated.Id));
 
-            // Generate algorithm
-            var trackUris = await playlistService.GeneratePlaylistAsync(playlistCreated.Id, playlistToCreate.DurationTravel, genresIdsChosenByUser, userAccessToken);
-
-            await this.spotifyPlaylistApi.AddItemsToPlaylist(spotifyPlaylist.Id, trackUris, null, userAccessToken);
+            await this.playlistService.AddCategoriesToPlaylist(playlistCreated.Id, categoryIdsChoosenByUser);
 
             return RedirectToAction("Success", "Home", new SuccessViewModel
             {
@@ -148,6 +195,5 @@ namespace TSound.Web.Controllers
                 urlItemCreated = $"/Playlists/PlaylistById/{playlistCreated.Id}"
             });
         }
-
     }
 }

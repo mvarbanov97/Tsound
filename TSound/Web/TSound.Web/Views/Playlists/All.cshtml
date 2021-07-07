@@ -57,22 +57,22 @@
                         </div>
                         <div class="flex-field genre-sort-row">
                             <div class="row">
-                                @if (Model.Genres != null)
+                                @if (Model.Categories != null)
                                 {
-                                     @for (int i = 0; i < Model.Genres.Count(); i++)
+                                     @for (int i = 0; i < Model.Categories.Count(); i++)
                                      {
                                              <div class="col-lg-4">
                                                  <div class="form-check">
-                                                     <label class="form-check-label" asp-for="@Model.Genres[i].IsSelected">
-                                                         <input class="form-check-input" type="checkbox" asp-for="@Model.Genres[i].IsSelected">
-                                                         @Model.Genres[i].Name&nbsp;
+                                                     <label class="form-check-label" asp-for="@Model.Categories[i].IsSelected">
+                                                         <input class="form-check-input" type="checkbox" asp-for="@Model.Categories[i].IsSelected">
+                                                         @Model.Categories[i].Name&nbsp;
                                                          <span class="form-check-sign">
                                                              <span class="check"></span>
                                                          </span>
                                                      </label>
                                                  </div>
-                                                 <input type="hidden" asp-for="@Model.Genres[i].Id" />
-                                                 <input type="hidden" asp-for="@Model.Genres[i].Name" />
+                                                 <input type="hidden" asp-for="@Model.Categories[i].Id" />
+                                                 <input type="hidden" asp-for="@Model.Categories[i].Name" />
                                              </div>
                                      }}
                             </div>

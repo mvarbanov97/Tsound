@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TSound.Data.Models;
-using TSound.Data.Models.SpotifyDomainModels;
+using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Models;
 using TSound.Services.Models.News;
 using TSound.Web.Models.ViewModels;
