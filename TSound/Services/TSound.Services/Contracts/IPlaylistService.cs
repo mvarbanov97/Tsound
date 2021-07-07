@@ -31,21 +31,6 @@ namespace TSound.Services.Contracts
 
         Task UpdatePlaylistSongsCountAsync(Guid playlistId, int count);
 
-        Task<T> GetPlaylistTracks<T>(string playlistId,
-            string accessToken = null,
-            string fields = null,
-            int? limit = null,
-            int offset = 0,
-            string market = null,
-            string[] additionalTypes = null);
-
-        Task<T> GetCategoryPlaylists<T>(
-            string categoryId,
-            string country = null,
-            int? limit = null,
-            int offset = 0,
-            string accessToken = null);
-
         Task<IEnumerable<PlaylistServiceModel>> Get3RandomPlaylists();
     }
 }

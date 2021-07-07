@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using TSound.Services.Models;
 
@@ -15,7 +14,5 @@ namespace TSound.Services.Contracts
         Task<IEnumerable<CategoryServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, Guid? apiKey = null);
 
         Task LoadCategoriesInDb();
-
-        Task<T> GetSpotifyCategoriesFromApi<T>();
     }
 }

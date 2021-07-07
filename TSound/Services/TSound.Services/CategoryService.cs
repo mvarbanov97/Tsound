@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
-using TSound.Plugin.Spotify.WebApi.Authorization;
+using TSound.Plugin.Spotify.WebApi.Contracts;
 using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
@@ -23,15 +18,16 @@ namespace TSound.Services
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        private readonly IConfiguration configuration;
-        private HttpClient http;
+        private readonly IBrowseApi browseApi;
 
-        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper, HttpClient http, IConfiguration configuration)
+        public CategoryService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IBrowseApi browseApi)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
-            this.http = http;
-            this.configuration = configuration;
+            this.browseApi = browseApi;
         }
 
         public async Task<CategoryServiceModel> GetCategoryByIdAsync(Guid categoryId)
@@ -76,7 +72,7 @@ namespace TSound.Services
             if (this.DatabaseContainsCategories())
                 return;
 
-            var categories = await this.GetSpotifyCategoriesFromApi<PagedCategories>();
+            var categories = await this.browseApi.GetCategories<PagedCategories>();
 
             foreach (var category in categories.Items)
             {
@@ -92,36 +88,6 @@ namespace TSound.Services
             }
 
             await this.unitOfWork.CompleteAsync();
-        }
-
-        public async Task<T> GetSpotifyCategoriesFromApi<T>()
-        {
-            var accounts = new AccountsService(http, configuration);
-            var token = await accounts.GetAccessToken();
-            var client = new HttpClient();
-            client.BaseAddress = new Uri($"https://api.spotify.com/v1/browse/categories");
-            client.DefaultRequestHeaders
-                  .Accept
-                  .Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-
-            request.Headers.TryAddWithoutValidation("limit", "10");
-            request.Headers.TryAddWithoutValidation("offset", "0");
-            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + token);
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                JObject deserialized = JsonConvert.DeserializeObject(result) as JObject;
-                var categories = deserialized["categories"].ToObject<T>();
-
-                return categories;
-            }
-            else
-                throw new HttpRequestException("Invalid request sent to the Spotify API.");
         }
 
         private bool DatabaseContainsCategories()

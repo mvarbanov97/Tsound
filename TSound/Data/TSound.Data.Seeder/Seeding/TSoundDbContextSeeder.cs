@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
+using TSound.Services.Contracts;
 
 namespace TSound.Data.Seeder.Seeding
 {

@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
-using TSound.Plugin.Spotify.WebApi.Extensions;
+using TSound.Plugin.Spotify.WebApi.Contracts;
 using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 using TSound.Services.Contracts;
 using TSound.Services.Extensions;
@@ -23,18 +20,21 @@ namespace TSound.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly IDateTimeProvider dateTimeProvider;
         private readonly IMapper mapper;
-        private readonly HttpClient http;
+        private readonly IPlaylistApi playlistApi;
+        private readonly IBrowseApi browseApi;
 
         public PlaylistService(
             IUnitOfWork unitOfWork,
             IDateTimeProvider dateTimeProvider,
             IMapper mapper,
-            HttpClient http)
+            IPlaylistApi playlistApi,
+            IBrowseApi browseApi)
         {
             this.unitOfWork = unitOfWork;
             this.dateTimeProvider = dateTimeProvider;
             this.mapper = mapper;
-            this.http = http;
+            this.playlistApi = playlistApi;
+            this.browseApi = browseApi;
         }
 
         /// <summary>
@@ -229,9 +229,9 @@ namespace TSound.Services
 
                 string randomCategoryId = categoryIdsToUse.Skip(random.Next(0, categoryIdsToUse.Count())).First();
 
-                var randomPlaylist = await this.GetCategoryPlaylists<PagedPlaylists>(randomCategoryId, "BG", 1, random.Next(1, 20), userAccessToken);
+                var randomPlaylist = await this.browseApi.GetCategoryPlaylists<PagedPlaylists>(randomCategoryId, "BG", 1, random.Next(1, 20), userAccessToken);
 
-                var randomTracksOfPlaylist = await this.GetPlaylistTracks<PlaylistPaged>(randomPlaylist.Items[0].Id, userAccessToken, null, random.Next(1, 3), random.Next(1, 20));
+                var randomTracksOfPlaylist = await this.playlistApi.GetTracks<PlaylistPaged>(randomPlaylist.Items[0].Id, userAccessToken, null, random.Next(1, 3), random.Next(1, 20));
 
                 var tracksToAdd = randomTracksOfPlaylist.Items.ToList();
 
@@ -280,72 +280,6 @@ namespace TSound.Services
             playlist.SongsCount = count;
 
             await this.unitOfWork.CompleteAsync();
-        }
-
-        public async Task<T> GetCategoryPlaylists<T>(
-            string categoryId,
-            string country = null,
-            int? limit = null,
-            int offset = 0,
-            string accessToken = null)
-        {
-            var baseUrl = $"https://api.spotify.com/v1/browse/categories/{categoryId}/playlists";
-
-            var builder = new UriBuilder($"{baseUrl}");
-            builder.AppendToQueryIfValueNotNullOrWhiteSpace("country", country);
-            builder.AppendToQueryIfValueGreaterThan0("limit", limit);
-            builder.AppendToQueryIfValueGreaterThan0("offset", limit);
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
-
-            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
-
-            var response = await this.http.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                JObject deserialized = JsonConvert.DeserializeObject(result) as JObject;
-                var playlists = deserialized["playlists"].ToObject<T>();
-
-                return playlists;
-            }
-
-            return default(T);
-        }
-
-        public async Task<T> GetPlaylistTracks<T>(
-            string playlistId,
-            string accessToken = null,
-            string fields = null,
-            int? limit = null,
-            int offset = 0,
-            string market = null,
-            string[] additionalTypes = null)
-        {
-            if (string.IsNullOrEmpty(playlistId)) throw new ArgumentNullException(nameof(playlistId));
-
-            var builder = new UriBuilder($"https://api.spotify.com/v1/playlists/{playlistId}/tracks");
-            builder.AppendToQueryIfValueNotNullOrWhiteSpace("fields", fields);
-            builder.AppendToQueryIfValueGreaterThan0("limit", limit);
-            builder.AppendToQueryIfValueGreaterThan0("offset", offset);
-            builder.AppendToQueryIfValueNotNullOrWhiteSpace("market", market);
-            builder.AppendToQueryAsCsv("additional_types", additionalTypes);
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
-            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
-
-            var response = await this.http.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                var playlistTracks = JsonConvert.DeserializeObject<T>(result);
-
-                return playlistTracks;
-            }
-
-            return default(T);
         }
 
         public async Task<IEnumerable<PlaylistServiceModel>> Get3RandomPlaylists()

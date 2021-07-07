@@ -7,17 +7,17 @@ using TSound.Services;
 
 namespace TSound.Data.Seeder.Seeding
 {
-    public class SongsSeeder : ISeeder
+    public class TracksSeeder : ISeeder
     {
-        private TrackService songsService;
+        private TrackService tracksService;
         private UnitOfWork.UnitOfWork unitOfWork;
         private IMapper mapper;
 
         public async Task SeedAsync(TSoundDbContext dbContext, IServiceProvider serviceProvider)
         {
             this.unitOfWork = new UnitOfWork.UnitOfWork(dbContext);
-            this.songsService = new TrackService(unitOfWork, mapper);
-            //await this.songsService.LoadSongsInDbAsync();
+            this.tracksService = new TrackService(unitOfWork, mapper);
+            //await tracksService.AddTracksToDbAsync();
         }
     }
 }
