@@ -291,6 +291,143 @@ namespace TSound.Services
             return result;
         }
 
+        public async Task<IEnumerable<PlaylistServiceModel>> GetPlaylistsByContainsSubstring(string substring)
+        {
+            IEnumerable<Playlist> playlists = await this.unitOfWork.Playlists
+                .All()
+                .Where(x => x.IsDeleted == false)
+                .Where(x => x.DurationTravel != 0)
+                .Include(x => x.Tracks)
+                .ThenInclude(playlistTrack => playlistTrack.Track)
+                .ToListAsync();
+
+            if (substring != null && this.unitOfWork.Playlists.All().Any(x => x.Name.Contains(substring)))
+            {
+                playlists = playlists.Where(x => x.Name.Contains(substring));
+                return this.mapper.Map<IEnumerable<PlaylistServiceModel>>(playlists).ToList();
+            }
+
+            return null;
+        }
+
+        public IEnumerable<PlaylistServiceModel> FilterByRange(IEnumerable<PlaylistServiceModel> collectionToFilter, string filterMethod, int min, int max)
+        {
+            if (filterMethod.ToLowerInvariant() == "duration")
+            {
+                // Convert input selection (HOURS) to miliseconds as the duration of the travel is persisted in miliseconds
+                int durationMilisecondsMin = ((min * 60) * 60) * 1000;
+                int durationMilisecondsMax = ((max * 60) * 60) * 1000;
+                collectionToFilter = collectionToFilter.Where(x => x.DurationTravel >= durationMilisecondsMin && x.DurationTravel <= durationMilisecondsMax).ToList();
+            }
+            else if (filterMethod.ToLowerInvariant() == "rank")
+            {
+                int rankMin = Math.Min(min, max);
+                int rankMax = Math.Max(min, max);
+
+                if (rankMin < 100000 || rankMin > 1000000)
+                {
+                    rankMin = 100000;
+                }
+                if (rankMax < 100000 || rankMax > 1000000)
+                {
+                    rankMax = 1000000;
+                }
+
+                collectionToFilter = collectionToFilter.Where(x => x.Rank >= rankMin && x.Rank <= rankMax).ToList();
+            }
+            else
+            {
+                throw new InvalidOperationException("FilterRange() method only supports filtering by 'duration' or by 'rank'");
+            }
+
+            return collectionToFilter;
+        }
+
+        public IEnumerable<PlaylistServiceModel> FilterByCategory(IEnumerable<PlaylistServiceModel> collectionToFilter, IEnumerable<Guid> categoryIds)
+        {
+            if (categoryIds == null || categoryIds.Count() == 0)
+            {
+                return collectionToFilter;
+            }
+            else
+            {
+                List<PlaylistServiceModel> collectionToReturn = new List<PlaylistServiceModel>();
+
+                foreach (PlaylistServiceModel playlist in collectionToFilter)
+                {
+                    bool areGenresIncludedInPlaylist = false;
+
+                    foreach (Guid categoryId in categoryIds)
+                    {
+                        if (this.unitOfWork.PlaylistCategories.All().Any(x => x.CategoryId == categoryId && x.PlaylistId == playlist.Id))
+                        {
+                            areGenresIncludedInPlaylist = true;
+                        }
+                        else
+                        {
+                            areGenresIncludedInPlaylist = false;
+                            break;
+                        }
+                    }
+
+                    if (areGenresIncludedInPlaylist)
+                    {
+                        collectionToReturn.Add(playlist);
+                    }
+                }
+
+                return collectionToReturn;
+            }
+        }
+
+        public IEnumerable<PlaylistServiceModel> Sort(IEnumerable<PlaylistServiceModel> collectionToFilter, string sortMethod, string sortOrder)
+        {
+            if (collectionToFilter == null || collectionToFilter.Count() == 0)
+            {
+                return collectionToFilter;
+            }
+
+            if (sortMethod.ToLowerInvariant() == "duration")
+            {
+                if (sortOrder.ToLowerInvariant() == "asc")
+                {
+                    collectionToFilter = collectionToFilter.OrderBy(x => x.DurationTravel);
+                }
+                else
+                {
+                    collectionToFilter = collectionToFilter.OrderByDescending(x => x.DurationTravel);
+                }
+            }
+            else if (sortMethod.ToLowerInvariant() == "rank")
+            {
+                if (sortOrder.ToLowerInvariant() == "asc")
+                {
+                    collectionToFilter = collectionToFilter.OrderBy(x => x.Rank);
+                }
+                else
+                {
+                    collectionToFilter = collectionToFilter.OrderByDescending(x => x.Rank);
+                }
+            }
+            else if (sortMethod.ToLowerInvariant() == "name")
+            {
+                if (sortOrder.ToLowerInvariant() == "asc")
+                {
+                    collectionToFilter = collectionToFilter.OrderBy(x => x.Name);
+                }
+                else
+                {
+                    collectionToFilter = collectionToFilter.OrderByDescending(x => x.Name);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Sort() method only supports sorting by 'duration', 'rank' and 'name'");
+            }
+
+            return collectionToFilter;
+        }
+
         private void ValidateIfUserWithThisApiKeyIsTheAuthorOfPlaylist(Guid playlistId, User user)
         {
             ValidatePlaylistId(playlistId);

@@ -32,5 +32,13 @@ namespace TSound.Services.Contracts
         Task UpdatePlaylistSongsCountAsync(Guid playlistId, int count);
 
         Task<IEnumerable<PlaylistServiceModel>> Get3RandomPlaylists();
+
+        Task<IEnumerable<PlaylistServiceModel>> GetPlaylistsByContainsSubstring(string substring);
+
+        IEnumerable<PlaylistServiceModel> FilterByRange(IEnumerable<PlaylistServiceModel> collectionToFilter, string filterMethod, int min, int max);
+
+        IEnumerable<PlaylistServiceModel> FilterByCategory(IEnumerable<PlaylistServiceModel> playlists, IEnumerable<Guid> genresIdsChosenByUser);
+
+        IEnumerable<PlaylistServiceModel> Sort(IEnumerable<PlaylistServiceModel> collectionToFilter, string sortMethod, string sortOrder);
     }
 }

@@ -86,6 +86,63 @@ namespace TSound.Web.Controllers
             return this.View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> All(AllPlaylistsViewModel input)
+        {
+            IEnumerable<PlaylistServiceModel> playlists;
+
+            if (input.NameToSearchForFilter != null)
+            {
+                // Filter by name
+                playlists = await this.playlistService.GetPlaylistsByContainsSubstring(input.NameToSearchForFilter);
+            }
+            else
+            {
+                playlists = await playlistService.GetAllPlaylistsAsync(false, null, false);
+
+                // Filter By Duration
+                if (input.DurationMinHoursFilter != 0 || input.DurationMaxHoursFilter != 0)
+                {
+                    playlists = playlistService.FilterByRange(playlists, "duration", input.DurationMinHoursFilter, input.DurationMaxHoursFilter);
+                }
+
+                // TODO: Add Filter by Rank
+
+                // Filter By Category
+                if (input.Categories != null && input.Categories.Count() != 0)
+                {
+                    var genresIdsChosenByUser = input.Categories.Where(x => x.IsSelected == true).Select(y => y.Id);
+                    playlists = playlistService.FilterByCategory(playlists, genresIdsChosenByUser);
+                }
+
+                // Sort
+                string sortMethod = input.SortMethod.ToString().ToLowerInvariant();
+                string sortOrder = input.SortOrder.ToString().ToLowerInvariant();
+
+                if (sortMethod == "sort")
+                {
+                    sortMethod = "rank";
+                }
+                if (sortOrder == "order")
+                {
+                    sortOrder = "desc";
+                }
+
+                playlists = playlistService.Sort(playlists, sortMethod, sortOrder);
+            }
+
+            AllPlaylistsViewModel model = new AllPlaylistsViewModel();
+            model.CollectionPlaylists = this.mapper.Map<IEnumerable<PlaylistLightViewModel>>(playlists);
+
+            var genresServiceModels = await this.categoryService.GetAllCategoriesAsync(false, null);
+            model.Categories = this.mapper.Map<IEnumerable<CategoryFullViewModel>>(genresServiceModels).ToList();
+
+            model.CurrentPage = 1;
+            model.Url = "/Playlists/All";
+
+            return this.View(model);
+        }
+
         public async Task<IActionResult> MyPlaylists(string email)
         {
             var user = await this.usersService.GetUserByEmailAsync(email);
