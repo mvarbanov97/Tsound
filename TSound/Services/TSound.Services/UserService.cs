@@ -124,6 +124,20 @@ namespace TSound.Services
             return null;
         }
 
+        /// <summary>
+        /// An async method that receives the id of a user and swaps its ban status.
+        /// </summary>
+        /// <param name="id">A Guid which is the identity of the user in the database.</param>
+        public async Task SwapUserBanStatusByIdAsync(Guid id)
+        {
+            var userInDb = await this.unitOfWork.Users.All().FirstOrDefaultAsync(x => x.Id == id);
+
+            userInDb.IsBanned = !userInDb.IsBanned;
+            userInDb.DateModified = DateTime.UtcNow;
+
+            await this.unitOfWork.CompleteAsync();
+        }
+
         public int GetTotalUsersCount()
         {
             return this.unitOfWork.Users.All().Where(x => !x.IsDeleted).Count();

@@ -21,6 +21,8 @@ namespace TSound.Services.Contracts
 
         Task<SpotifyUser> GetCurrentUserSpotifyProfile(string accessToken);
 
+        Task SwapUserBanStatusByIdAsync(Guid id);
+
         int GetTotalUsersCount();
 
         int GetPageCountSizing();

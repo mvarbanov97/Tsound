@@ -101,6 +101,39 @@ namespace TSound.Services
         }
 
         /// <summary>
+        /// An async method that updates a playlist based on the information provided in a PlaylistServiceModel that comes as a method parameter.
+        /// </summary>
+        /// <param name="playlist">A PlaylistServiceModel that keeps the information of the playlist to be updated.</param>
+        /// <returns>A task that represents a PlaylistServiceModel that holds all information of the updated user.</returns>
+        public async Task<PlaylistServiceModel> UpdatePlaylistAsync(PlaylistServiceModel playlistToUpdate)
+        {
+            this.ValidatePlaylistId(playlistToUpdate.Id);
+            this.ValidateIfPlaylistIsUnlisted(playlistToUpdate.Id);
+            this.ValidateIfPlaylistIsDeleted(playlistToUpdate.Id);
+
+            User user = null;
+
+            var playlistInDb = await this.unitOfWork.Playlists.All().FirstOrDefaultAsync(x => x.Id == playlistToUpdate.Id);
+
+            this.ValidateIfNameIsNullOrEmpty(playlistToUpdate.Name);
+
+            playlistInDb.Name = playlistToUpdate.Name;
+            playlistInDb.Description = playlistToUpdate.Description;
+            playlistInDb.DateModified = dateTimeProvider.GetDateTime();
+
+            await this.unitOfWork.CompleteAsync();
+
+            var playlistInDbUpdated = await this.unitOfWork.Playlists.All()
+                .Include(x => x.User)
+                .Include(x => x.Categories)
+                .Include(x => x.Tracks)
+                .ThenInclude(playlistSong => playlistSong.Track)
+                .FirstOrDefaultAsync(p => p.Id == playlistToUpdate.Id);
+
+            return this.mapper.Map<PlaylistServiceModel>(playlistInDbUpdated);
+        }
+
+        /// <summary>
         /// An async method that deletes a playlist if a playlist with such id (from the parameter of the method) exists.
         /// </summary>
         /// <param name="playlistId">A Guid that is the id of the playlist to delete.</param>
@@ -437,6 +470,14 @@ namespace TSound.Services
             if (playlist.UserId != user.Id)
             {
                 throw new InvalidOperationException("The current User is not the author of the Playlist so no operations with it are allowed.");
+            }
+        }
+
+        private void ValidateIfNameIsNullOrEmpty(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                throw new ArgumentNullException("Value cannot be an empty string or null.");
             }
         }
 

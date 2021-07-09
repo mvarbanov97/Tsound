@@ -15,6 +15,8 @@ namespace TSound.Services.Contracts
 
         Task AddCategoriesToPlaylist(Guid playlistId, IEnumerable<string> categories);
 
+        Task<PlaylistServiceModel> UpdatePlaylistAsync(PlaylistServiceModel playlistToUpdate);
+
         Task<bool> DeletePlaylistAsync(Guid playlistId, bool isApiKeyRequired = false, Guid? userApiKey = null);
 
         Task<IEnumerable<PlaylistServiceModel>> GetAllPlaylistsAsync(bool isApiKeyRequired = false, Guid? userApiKey = null, bool isAdmin = false);
