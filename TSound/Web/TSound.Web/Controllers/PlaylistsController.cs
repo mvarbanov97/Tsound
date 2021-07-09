@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSound.Common;
 using TSound.Data.Models;
-using TSound.Plugin.Spotify.WebApi;
 using TSound.Plugin.Spotify.WebApi.Authorization;
 using TSound.Plugin.Spotify.WebApi.Contracts;
 using TSound.Plugin.Spotify.WebApi.SpotifyModels;
@@ -28,6 +27,7 @@ namespace TSound.Web.Controllers
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
         private readonly IPlaylistApi spotifyPlaylistApi;
+        private readonly IUserProfileApi userProfileApi;
         private readonly IPlaylistService playlistService;
         private readonly IUserService usersService;
         private readonly ICategoryService categoryService;
@@ -40,22 +40,24 @@ namespace TSound.Web.Controllers
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IPlaylistApi spotifyPlaylistApi,
+            IUserProfileApi userProfileApi,
             IPlaylistService playlistService,
             IUserService usersService,
-            ICategoryService genreService,
-            ITrackService songService,
+            ICategoryService categoryService,
+            ITrackService trackService,
             IMapper mapper,
             IUserAccountsService userAccountsService,
             IApplicationCloudinary applicationCloudinary)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.spotifyPlaylistApi = spotifyPlaylistApi;
+            this.userProfileApi = userProfileApi;
             this.playlistService = playlistService;
             this.usersService = usersService;
-            this.categoryService = genreService;
-            this.trackService = songService;
+            this.categoryService = categoryService;
+            this.trackService = trackService;
             this.mapper = mapper;
-            this.spotifyPlaylistApi = spotifyPlaylistApi;
             this.userAccountsService = userAccountsService;
             this.applicationCloudinary = applicationCloudinary;
         }
@@ -203,7 +205,8 @@ namespace TSound.Web.Controllers
             var refreshToken = await this.userAccountsService.GetRefreshTokenFromDb(currentUser.Id);
             var token = await this.userAccountsService.RefreshUserAccessToken(refreshToken);
 
-            var spotifyUser = await this.usersService.GetCurrentUserSpotifyProfile(token.AccessToken);
+            // var spotifyUser = await this.usersService.GetCurrentUserSpotifyProfile(token.AccessToken);
+            var spotifyUser = await this.userProfileApi.GetCurrentUsersProfile(token.AccessToken);
 
             var details = new PlaylistDetails { Name = input.Name, Description = input.Description, Public = true };
 
