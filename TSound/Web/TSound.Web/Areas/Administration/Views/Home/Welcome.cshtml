@@ -1,0 +1,94 @@
+﻿<partial name="_AdminsPartial" />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header mb-1">
+                <h5 class="card-category">Admins only...</h5>
+                <h3 class="card-title">Terms & Conditions</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <img src="~/images/users/admin_welcome_600x600.jpg" alt="admin_welcome" class="img-circle-lg" />
+                    </div>
+                    <div class="col-md-10">
+                        <blockquote>
+                            <div class="blockquote blockquote-primary">
+                                <h4 class="text-success">Welcome to the Admininistrators' platform!</h4>
+                                <p>System administrators can administer all major information objects in the system. On top of the regular user capabilities, the administrators have capabilities described below.</p>
+                                <ul>
+                                    <li>
+                                        Administrators must be able to:
+                                        <ul>
+                                            <li>Edit users / administrators</li>
+                                            <li>Delete users / administrators</li>
+                                            <li>Edit playlists</li>
+                                            <li>Delete playlists</li>
+                                            <li>Manually trigger Genre synchronization</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </blockquote>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <input type="button" value="Categories" onclick="window.location='@Url.Action("Genres", "Admins")'" class="btn btn-lg btn-primary btn-round" />
+                    </div>
+                    <div class="col-md-10">
+                        <blockquote>
+                            <div class="blockquote blockquote-primary">
+                                <p class="text-success">Categories includes:</p>
+                                <ul>
+                                    <li>'Synchronize Genres' functionality that lets administrators to sync genres with a click of a button</li>
+                                    <li>Logging that keeps track of all latest synchronizations by date and status</li>
+                                </ul>
+                            </div>
+                        </blockquote>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <input type="button" value="Playlists" onclick="window.location='@Url.Action("Playlists", "Playlists")'" class="btn btn-lg btn-primary btn-round" />
+                    </div>
+                    <div class="col-md-10">
+                        <blockquote>
+                            <div class="blockquote blockquote-primary">
+                                <p class="text-success">Playlists includes:</p>
+                                <ul>
+                                    <li>Table with paging that includes all Playlists that exist in the database, sorted by Date Created descending</li>
+                                    <li>'Update' lets administrators edit the name, the description and the image of a playlist easily</li>
+                                    <li>'List / Unlist' hides or reveals a playlist for the ordinary user keeping it visible for administrators in the platform</li>
+                                    <li>'Delete' removes a playlist from the application and neither administrators nor ordinary users have access to the deleted entity</li>
+                                </ul>
+                            </div>
+                        </blockquote>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <input type="button" value="Users" onclick="window.location='@Url.Action("ManageUsers", "Users")'" class="btn btn-lg btn-primary btn-round" />
+                    </div>
+                    <div class="col-md-10">
+                        <blockquote>
+                            <div class="blockquote blockquote-primary">
+                                <p class="text-success">Users includes:</p>
+                                <ul>
+                                    <li>Table with paging that includes all Users that exist in the database, sorted by Date Created descending</li>
+                                    <li>'Ban / Unban' hides or reveals a user for other ordinary users, but keeping it visible for administrators in the platform</li>
+                                    <li>'Delete' removes a user from the application and neither administrators nor ordinary users have access to the deleted entity</li>
+                                </ul>
+                            </div>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
