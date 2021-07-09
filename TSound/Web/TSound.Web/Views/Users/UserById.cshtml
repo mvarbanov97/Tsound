@@ -68,7 +68,7 @@
                     </div>
                     <div>
                         <br />
-                        <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.PlaylistsCount</button></p>
+                        <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.Playlists.Count()</button></p>
                         @if (Model.PlaylistsCount != 0)
                         {
                             <table class="table tablesorter " id="table-playlists" style="visibility:collapse">

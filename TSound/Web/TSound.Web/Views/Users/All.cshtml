@@ -17,39 +17,28 @@
         <div class="col-lg-3">
             <div class="card card-user @(item.IsAdmin ? "border border-success" : "")">
                 <div class="card-body">
-                    <p class="card-text">
-                    </p><div class="author">
-                        <div class="block block-one"></div>
-                        <div class="block block-two"></div>
-                        <div class="block block-three"></div>
-                        <div class="block block-four"></div>
+                    <div class="author">
                         <a href="@Url.Action("UserById", "Users", new { id = item.Id })">
-                            <img src="@item.ImageUrl" class="img-circle-lg" height="200" width="400" />
-                            <br />
+                            <img src="@item.ImageUrl" class="img-circle-lg" />
                             <h3 class="title">@item.FirstName @item.LastName</h3>
                         </a>
                         <div class="row">
-                            <div class="col-md-2"></div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <p class="text-center"><i class="tim-icons icon-calendar-60"></i></p>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <p class="text-center"><i class="tim-icons icon-headphones"></i></p>
                             </div>
-                            <div class="col-md-2"></div>
                         </div>
                         <div class="row">
-                            <div class="col-md-2"></div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <p class="text-center">@item.DateCreated.ToString().Split(" ")[0]</p>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <p class="text-center">@item.PlaylistsCount</p>
                             </div>
-                            <div class="col-md-2"></div>
                         </div>
                     </div>
-                    <p></p>
                     <div class="card-description"></div>
                 </div>
             </div>
