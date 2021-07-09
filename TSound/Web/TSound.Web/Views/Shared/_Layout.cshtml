@@ -47,7 +47,7 @@
                     </div>
                     <ul class="nav">
                         <li class="@(title.ToLowerInvariant() == "playlists / create" ? "active" : "")" style="background-color: #54036D;">
-                            <a href="@Url.Action("Create", "Playlists")">
+                            <a asp-area="" asp-controller="Playlists" asp-action="Create">
                                 <i class="tim-icons icon-headphones"></i>
                                 <p class=""><b>Create Playlist!</b></p>
                             </a>
@@ -57,7 +57,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="@(title.ToLowerInvariant() == "playlists / myplaylists" ? "active" : "")">
-                                <a href="@Url.Action("MyPlaylists", "Playlists", new { email = User.Identity.Name })">
+                                <a asp-area="" asp-controller="Playlists" asp-action="MyPlaylists" asp-route-email="@User.Identity.Name">
                                     <i class="tim-icons icon-headphones"></i>
                                     <p class=""><b>My Playlists</b></p>
                                 </a>
@@ -154,7 +154,7 @@
                                             </li>
                                             <li class="dropdown-divider"></li>
                                             <li class="nav-link">
-                                                <a href="@Url.Action("MyPlaylists", "Playlists", new { email = User.Identity.Name })" class="nav-item dropdown-item">My Playlists</a>
+                                                <a asp-area="" asp-controller="Playlists" asp-action="MyPlaylists" asp-route-email="@User.Identity.Name" class="nav-item dropdown-item">My Playlists</a>
                                             </li>
                                             <li class="nav-link">
                                                 <a class="nav-item dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Profile</a>

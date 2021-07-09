@@ -1,0 +1,114 @@
+﻿@model AllPlaylistsViewModel
+@{
+    int num = 0;
+}
+
+<partial name="_AdminsPartial" />
+
+<partial name="_PageNavigatorPartial" model="@Model" />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title"> Playlists</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table tablesorter " id="">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>
+                                    Image
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    <i class="tim-icons icon-calendar-60"></i> Created
+                                </th>
+                                <th>
+                                    <i class="tim-icons icon-calendar-60"></i> Modified
+                                </th>
+                                <th>
+                                    User
+                                </th>
+                                <th>
+                                    <i class="tim-icons icon-time-alarm"></i> Playlist Duration
+                                </th>
+                                <th>
+                                    Categories Count
+                                </th>
+                                <th>
+                                    Tracks Count
+                                </th>
+                                <th>
+                                    Rank
+                                </th>
+                                <th class="text-center">
+                                    Update
+                                </th>
+                                <th class="text-center">
+                                    Delete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.CollectionPlaylists)
+                            {
+                                num++;
+                                <tr>
+                                    <td>
+                                        @(num + (@Model.CurrentPage * Model.PageSize) - Model.PageSize)
+                                    </td>
+                                    <td>
+                                        <a asp-area="" asp-controller="Playlists" asp-action="PlaylistById" asp-route-id="@item.Id"><img src="@item.Image" id="img-circle" height="50"></a>
+                                    </td>
+                                    <td>
+                                        <a asp-area="" asp-controller="Playlists" asp-action="PlaylistById" asp-route-id="@item.Id"><p>@item.Name</p></a>
+                                    </td>
+                                    <td>
+                                        <p>@(item.DateCreated.ToString("dd/M/yyyy"))</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.DateModified</p>
+                                    </td>
+                                    <td>
+                                        <a asp-area="" asp-controller="Users" asp-action="UserById" asp-route-id="@item.UserId"><p><img src="@item.UserImageUrl" id="img-circle" height="30" /> @item.UserName</p></a>
+                                    </td>
+                                    <td>
+                                        <p>@((item.DurationTravel / 1000) / 60) min</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.CategoriesCount</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.SongsCount</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.Rank.ToString("F0")</p>
+                                    </td>
+                                    <td class="text-center">
+                                        <a type="button" class="btn btn-primary btn-round" asp-area="" asp-action="Update" asp-controller="Playlists" asp-route-id="@item.Id"><i class="tim-icons icon-pencil"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        @{
+                                            item.IsToBeDeletedByAdmin = true;
+                                            item.NameController = "Playlists";
+                                            item.CurrentPage = Model.CurrentPage;
+                                        }
+                                        <partial name="_DeleteModalPartial" model="@item" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />

@@ -1,0 +1,125 @@
+﻿@model CollectionUserFullViewModel
+
+@{
+    int num = 0;
+}
+
+<partial name="_AdminsPartial" />
+
+<partial name="_PageNavigatorPartial" model="@Model" />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title"> Users</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table tablesorter " id="">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>
+                                    Image
+                                </th>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Date Created
+                                </th>
+                                <th>
+                                    Date Modified
+                                </th>
+                                <th>
+                                    Playlists
+                                </th>
+                                <th>
+                                    API Key
+                                </th>
+                                <th class="text-center">
+                                    Admin?
+                                </th>
+                                <th class="text-center">
+                                    Ban / Unban
+                                </th>
+                                <th class="text-center">
+                                    Delete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Users)
+                            {
+                                num++;
+                                <tr>
+                                    <td>
+                                        @(num + (@Model.CurrentPage * Model.PageSize) - Model.PageSize)
+                                    </td>
+                                    <td>
+                                        <a asp-area="" asp-controller="Users" asp-action="UserById" asp-route-id="@item.Id"><img src="@item.ImageUrl" id="img-circle" height="50"></a>
+                                    </td>
+                                    <td>
+                                        <a asp-area="" asp-controller="Users" asp-action="UserById" asp-route-id="@item.Id"><p>@(item.FirstName + " " + @item.LastName)</p></a>
+                                    </td>
+                                    <td>
+                                        <p>@item.DateCreated</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.DateModified</p>
+                                    </td>
+                                    <td>
+                                        <p>@item.PlaylistsCount</p>
+                                    </td>
+                                    <td>
+                                        @if (item.ApiKey.ToString() == "00000000-0000-0000-0000-000000000000")
+                                        {
+                                            <i class="tim-icons icon-simple-remove text-danger"></i>
+                                        }
+                                        else
+                                        {
+                                            <p>@item.ApiKey</p>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.IsAdmin)
+                                        {
+                                            <i class="tim-icons icon-check-2 text-success"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="tim-icons icon-simple-remove text-danger"></i>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @if (item.IsBanned)
+                                        {
+                                            <a asp-area="Administration" asp-controller="Users" asp-action="SwapBanStatus" asp-route-id="@item.Id" asp-route-isSwappedByAdmin="@true" asp-route-page="@Model.CurrentPage" type="button" class="btn btn-success btn-round"><i class="tim-icons icon-simple-add"></i></a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-area="Administration" asp-controller="Users" asp-action="SwapBanStatus" asp-route-id="@item.Id" asp-route-isSwappedByAdmin="@true" asp-route-page="@Model.CurrentPage" type="button" class="btn btn-warning btn-round"><i class="tim-icons icon-simple-remove"></i></a>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        @{
+                                            item.Name = item.FirstName = " " + item.LastName;
+                                            item.IsToBeDeletedByAdmin = true;
+                                            item.NameController = "Users";
+                                            item.CurrentPage = Model.CurrentPage;
+                                        }
+                                        <partial name="_DeleteModalPartial" model="@item" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />

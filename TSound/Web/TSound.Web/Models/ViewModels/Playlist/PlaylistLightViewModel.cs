@@ -14,7 +14,7 @@ namespace TSound.Web.Models.ViewModels.Playlist
 
         public string Description { get; set; }
 
-        public DateTime? DateCreated { get; set; }
+        public DateTime DateCreated { get; set; }
 
         public DateTime? DateModified { get; set; }
 
