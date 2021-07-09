@@ -15,12 +15,6 @@ namespace TSound.Services.Contracts
 
         Task<UserServiceModel> GetUserByEmailAsync(string email);
 
-        Task<string> GetUserSpotifyId(string id);
-
-        Task<SpotifyUser> GetSpotifyUser(string id, string accessToken);
-
-        Task<SpotifyUser> GetCurrentUserSpotifyProfile(string accessToken);
-
         Task SwapUserBanStatusByIdAsync(Guid id);
 
         int GetTotalUsersCount();

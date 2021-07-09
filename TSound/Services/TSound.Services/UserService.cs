@@ -66,64 +66,6 @@ namespace TSound.Services
             return this.mapper.Map<UserServiceModel>(user);
         }
 
-        public async Task<string> GetUserSpotifyId(string id)
-        {
-            var userLogins = this.unitOfWork.UserLogins.All().FirstOrDefault(x => x.UserId.ToString() == id);
-            var spotifyId = userLogins.ProviderKey;
-
-            return spotifyId;
-        }
-
-        public async Task<SpotifyUser> GetSpotifyUser(string id, string accessToken)
-        {
-            HttpClient client = new HttpClient();
-
-            client.BaseAddress = new Uri($"https://api.spotify.com/v1/users/{id}");
-            client.DefaultRequestHeaders
-                  .Accept
-                  .Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
-                  
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-            request.Headers.TryAddWithoutValidation("Content-Type", "application/json");
-            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                SpotifyUser spotifyUserData = JsonConvert.DeserializeObject<SpotifyUser>(result);
-
-                return spotifyUserData;
-            }
-
-            return null;
-        }
-
-        public async Task<SpotifyUser> GetCurrentUserSpotifyProfile(string accessToken)
-        {
-            HttpClient client = new HttpClient();
-
-            // TODO: Move all magic strings into Common project => GlobalConstants
-            client.BaseAddress = new Uri($"https://api.spotify.com/v1/me"); 
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-            request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
-
-            var response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadAsStringAsync();
-                SpotifyUser spotifyUserData = JsonConvert.DeserializeObject<SpotifyUser>(result);
-
-                return spotifyUserData;
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// An async method that receives the id of a user and swaps its ban status.
         /// </summary>

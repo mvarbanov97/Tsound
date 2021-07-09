@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using TSound.Data.Models;
 using TSound.Data.UnitOfWork;
+using TSound.Plugin.Spotify.WebApi.Contracts;
 using TSound.Services.Contracts;
 
 namespace TSound.Web.Areas.Identity.Pages.Account
@@ -27,7 +28,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
-        private readonly IUserService _userService;
+        private readonly IUserProfileApi _userProfileApi;
         private readonly IUnitOfWork _unitOfWork;
 
         public ExternalLoginModel(
@@ -35,15 +36,15 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             UserManager<User> userManager,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IUserService userService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IUserProfileApi userProfileApi)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
-            _userService = userService;
             _unitOfWork = unitOfWork;
+            _userProfileApi = userProfileApi;
         }
 
         [BindProperty]
@@ -150,7 +151,7 @@ namespace TSound.Web.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var accessToken = info.AuthenticationTokens.First().Value;
-                var spotifyDetails = await _userService.GetSpotifyUser(info.ProviderKey, accessToken);
+                var spotifyDetails = await _userProfileApi.GetCurrentUsersProfile(accessToken);
                 var fullName = spotifyDetails.DisplayName.Split(' ');
 
                 var user = new User { UserName = Input.Email, Email = Input.Email, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow, ImageUrl = spotifyDetails.Images[0].Url, FirstName = fullName[0], LastName = fullName[1] };
