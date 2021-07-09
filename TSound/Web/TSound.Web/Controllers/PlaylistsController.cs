@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -250,6 +251,41 @@ namespace TSound.Web.Controllers
             {
                 urlGeneral = "/playlists/all",
                 urlItemCreated = $"/Playlists/PlaylistById/{playlistCreated.Id}"
+            });
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Update(Guid id)
+        {
+            PlaylistServiceModel playlistToUpdate = await this.playlistService.GetPlaylistByIdAsync(id);
+
+            var input = this.mapper.Map<PlaylistViewModel>(playlistToUpdate);
+
+            return this.View(input);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Update(PlaylistViewModel input)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View(input);
+            }
+
+            PlaylistServiceModel playlistToUpdate = new PlaylistServiceModel
+            {
+                Id = input.Id,
+                Name = input.Name,
+                Description = input.Description
+            };
+
+            await this.playlistService.UpdatePlaylistAsync(playlistToUpdate);
+
+            return RedirectToAction("Success", "Home", new SuccessViewModel
+            {
+                urlGeneral = "/Playlists/All",
+                urlItemCreated = $"/Playlists/PlaylistById/{input.Id}"
             });
         }
     }
