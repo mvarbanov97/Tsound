@@ -90,7 +90,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="@(title.ToLowerInvariant() == "admins / welcome" ? "active" : "")">
-                                <a asp-area="" asp-controller="Admins" asp-action="Welcome">
+                                <a asp-area="Administration" asp-controller="Home" asp-action="Welcome">
                                     <i class="tim-icons icon-puzzle-10"></i>
                                     <p>Admin Page</p>
                                 </a>

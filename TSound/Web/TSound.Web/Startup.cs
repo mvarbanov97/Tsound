@@ -186,6 +186,11 @@ namespace TSound.Web
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapAreaControllerRoute(
+                      name: "admin",
+                      areaName: "Administration",
+                      pattern: "Administration/{controller=Home}/{action=Index}/{id?}");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

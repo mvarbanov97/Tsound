@@ -1,0 +1,21 @@
+﻿@{
+    string btnOutlineWarning = "btn btn-outline-primary";
+    string btnWarning = "btn btn-primary";
+
+    string pageCurrentName = Context.Request.Path.ToString().Split('/').ToArray().Last();
+}
+
+<div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6 text-center">
+        <input type="button" value="Home" onclick="window.location='@Url.Action("Welcome", "Home")'" class="@(pageCurrentName == "Welcome" ? btnWarning : btnOutlineWarning)  btn-round" />
+        <input type="button" value="Categories" onclick="window.location='@Url.Action("Categories", "Categories")'" class="@(pageCurrentName == "Categories" ? btnWarning : btnOutlineWarning) btn-round" />
+        <input type="button" value="Playlists" onclick="window.location='@Url.Action("Playlists", "Playlists")'" class="@(pageCurrentName == "Playlists" ? btnWarning : btnOutlineWarning) btn-round" />
+        <input type="button" value="Users" onclick="window.location='@Url.Action("ManageUsers", "Users")'" class="@(pageCurrentName == "Users" ? btnWarning : btnOutlineWarning) btn-round" />
+    </div>
+    <div class="col-md-3 text-right">
+        <p>Welcome, Admin!</p>
+    </div>
+</div>
+<br />
