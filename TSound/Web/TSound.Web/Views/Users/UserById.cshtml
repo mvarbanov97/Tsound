@@ -18,10 +18,6 @@
             <div class="card-body">
                 <p class="card-text">
                 </p><div class="author">
-                    <div class="block block-one"></div>
-                    <div class="block block-two"></div>
-                    <div class="block block-three"></div>
-                    <div class="block block-four"></div>
                     <a href="@Url.Action("UserById", "Users", new { id = Model.Id })">
                         <img src="@Model.ImageUrl" class="img-circle-lg" />
                         <br />
@@ -68,9 +64,9 @@
                     </div>
                     <div>
                         <br />
-                        <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.Playlists.Count()</button></p>
                         @if (Model.PlaylistsCount != 0)
                         {
+                            <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.Playlists.Count()</button></p>
                             <table class="table tablesorter " id="table-playlists" style="visibility:collapse">
                                 <thead class=" text-primary">
                                     <tr>
@@ -108,6 +104,10 @@
                             </table>
                             <table id="table-playlists" class="table table-dark table-striped table-bordered text-white" style="visibility:collapse">
                             </table>
+                        }
+                        else
+                        {
+                            <p><b>Playlists: </b><button onclick="expandListPlaylists()" class="btn btn-sm btn-primary">@Model.PlaylistsCount</button></p>
                         }
                     </div>
                     <p></p>

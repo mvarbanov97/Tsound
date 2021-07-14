@@ -48,4 +48,8 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Administration\Views\Categories\" />
+  </ItemGroup>
+
 </Project>

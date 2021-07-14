@@ -318,7 +318,12 @@ namespace TSound.Services
         public async Task<IEnumerable<PlaylistServiceModel>> Get3RandomPlaylists()
         {
             var random = new Random();
-            var threeRandomPlaylists = await this.unitOfWork.Playlists.All().Skip(random.Next(1, 5)).Take(3).ToListAsync();
+            var threeRandomPlaylists = await this.unitOfWork.Playlists.All()
+                .Where(x => x.IsDeleted == false)
+                .Include(x => x.Tracks)
+                .Skip(random.Next(1, 5))
+                .Take(3)
+                .ToListAsync();
 
             var result = this.mapper.Map<IEnumerable<PlaylistServiceModel>>(threeRandomPlaylists);
             return result;

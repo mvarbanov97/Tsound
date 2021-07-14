@@ -107,6 +107,7 @@ namespace TSound.Web
             services.AddTransient<IAccountsService, AccountsService>();
             services.AddTransient<IPlaylistApi, PlaylistApi>();
             services.AddTransient<IBrowseApi, BrowseApi>();
+            services.AddTransient<IUserProfileApi, UsersProfileApi>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
