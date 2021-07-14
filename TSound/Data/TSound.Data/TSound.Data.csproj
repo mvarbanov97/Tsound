@@ -23,6 +23,10 @@
     <Compile Remove="Migrations\20210622062544_ChangedDomainModelsToWorkWithSpotifyApi.Designer.cs" />
     <Compile Remove="Migrations\20210623080028_ReplaceRankPropertyWithPopularity.cs" />
     <Compile Remove="Migrations\20210623080028_ReplaceRankPropertyWithPopularity.Designer.cs" />
+    <Compile Remove="Migrations\20210702140929_CustomizedUserTokens.cs" />
+    <Compile Remove="Migrations\20210702140929_CustomizedUserTokens.Designer.cs" />
+    <Compile Remove="Migrations\20210702142530_CustomizedUserTokens.cs" />
+    <Compile Remove="Migrations\20210702142530_CustomizedUserTokens.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

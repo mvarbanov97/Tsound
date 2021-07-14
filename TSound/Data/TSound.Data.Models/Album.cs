@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using TSound.Data.Models.SpotifyDomainModels;
 
 namespace TSound.Data.Models
 {
@@ -26,8 +25,8 @@ namespace TSound.Data.Models
         [JsonProperty("release_date")]
         public string ReleaseDate { get; set; }
 
-        [JsonProperty("external_urls")]
-        public ExternalUrls ExternalUrls { get; set; }
+        [JsonProperty("external_urls:spotify")]
+        public string ExternalUrls { get; set; }
 
         [JsonProperty("total_tracks")]
         public long TotalTracks { get; set; }
