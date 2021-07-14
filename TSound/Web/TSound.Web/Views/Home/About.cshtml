@@ -1,0 +1,114 @@
+﻿@model CollectionUserFullViewModel
+
+@{
+    var momchil = Model.Users.First(x => x.FirstName == "Momchil");
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <br /><p class="h2 text-center">@momchil.FirstName @momchil.LastName</p>
+            <div class="text-center">
+                <a href="@Url.Action("UserById", "Users", new { id = momchil.Id })">
+                    <img src="@momchil.ImageUrl" id="img-circle" height="300" />
+                </a>
+                <br />
+            </div>
+            <br />
+            <div>
+                <h4 class="text-primary">SUMMARY</h4>
+                <p>
+                    Positive, Curious, Ambitious 23-years old C# Programmer.
+                </p>
+            </div>
+            <br />
+
+            <div>
+                <h4 class="text-primary">FIND ME ONLINE</h4>
+                <div class="row">
+                    <div class="col-md-1">
+                        <a><i class="fas fa-globe fa-2x"></i></a>
+                    </div>
+                    <div class="col-md-11">
+                        <a href="https://mvarbanov97.github.io/Portfolio-Website/" target="_blank"><p>Portfolio Website</p></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1">
+                        <a><i class="fab fa-github fa-2x"></i></a>
+                    </div>
+                    <div class="col-md-11">
+                        <a href="https://github.com/mvarbanov97" target="_blank"><p>www.github.com/mvarbanov97</p></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1">
+                        <a><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                    <div class="col-md-11">
+                        <a href="https://www.linkedin.com/in/momchil-varbanov/" target="_blank"><p>www.linkedin.com/in/momchil-varbanov</p></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1">
+                        <a><i class="fab fa-google fa-2x"></i></a>
+                    </div>
+                    <div class="col-md-11">
+                        <a><p>momchil.varbanov97@gmail.com</p></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1">
+                        <a><i class="fas fa-mobile-alt fa-2x"></i></a>
+                    </div>
+                    <div class="col-md-11">
+                        <a><p>+359 895 480 865</p></a>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+
+
+    <div class="col-md-6 card p-3">
+        <h4 class="text-primary">MY .NET CORE WEB PROJECTS</h4>
+        <a href="https://github.com/mvarbanov97/Tsound" target="_blank"><i class="fab fa-github fa-2x"></i> TSound</a>
+        <p>
+            'TSound' is a web application that generates you a playlist of prefered genre in just few clicks. It's working with Spotify Web API so you can listen to the generated playlist in your spotify account as well.
+        </p>
+        <p>Technologies:</p>
+        <ul>
+            <li>Spotify API</li>
+            <li>Google Maps API</li>
+            <li>News API</li>
+            <li>Automapper</li>
+            <li>EntityFrameworkCore</li>
+            <li>jQuery</li>
+            <li>Serilog</li>
+        </ul>
+        <br />
+
+        <a href="https://github.com/mvarbanov97/Tompany" target="_blank"><i class="fab fa-github fa-2x"></i> Tompany</a>
+        <p>
+            'Tompany' is a web application which is developed in Visual Studio Enterprise in C#. It is a shared transport application. The applicaiton shows all created travel posts to the user. There is also real-time private/group chat, so users can understand each other further when they link up.
+        </p>
+        <p>Technologies:</p>
+        <ul>
+            <li>Automapper</li>
+            <li>EntityFrameworkCore</li>
+            <li>Bootstrap</li>
+            <li>SignalR</li>
+            <li>Fluent validation</li>
+            <li>Sendgrid</li>
+            <li>CloudinaryDotNet</li>
+            <li>xUnit</li>
+            <li>Mock</li>
+        </ul>
+        <br />
+
+    </div>
+
+</div>
+
+<br />
