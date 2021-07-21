@@ -11,7 +11,6 @@ namespace TSound.Data
         public TSoundDbContext(DbContextOptions<TSoundDbContext> options)
             : base(options)
         {
-
         }
 
         public DbSet<Artist> Artists { get; set; }
