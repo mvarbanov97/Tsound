@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "TSound.Services.Tests": {
+      "commandName": "Project"
+    }
+  }
+}
