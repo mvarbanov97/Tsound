@@ -12,18 +12,18 @@ namespace TSound.Data.Configuration
         public void Configure(EntityTypeBuilder<PlaylistTrack> builder)
         {
             builder
-                .HasKey(playSong => new { playSong.PlaylistId, playSong.TrackId });
+                .HasKey(pt => new { pt.PlaylistId, pt.TrackId });
             
             builder
-                .HasOne(playSong => playSong.Playlist)
+                .HasOne(pt => pt.Playlist)
                 .WithMany(playlist => playlist.Tracks)
-                .HasForeignKey(playSong => playSong.PlaylistId)
+                .HasForeignKey(pt => pt.PlaylistId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder
-                .HasOne(playSong => playSong.Track)
-                .WithMany(song => song.Playlists)
-                .HasForeignKey(playSong => playSong.TrackId)
+                .HasOne(pt => pt.Track)
+                .WithMany(track => track.Playlists)
+                .HasForeignKey(pt => pt.TrackId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
