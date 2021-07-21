@@ -48,7 +48,6 @@ namespace TSound.Services.Tests.Infrastructure
             var thirdUser = new User { Id = Guid.NewGuid(), UserName = "FooUser3", Email = "Foo3@bg.bg", PasswordHash = "asd" };
 
             dbContext.AddRange(firstUser, secondUser, thirdUser);
-            dbContext.SaveChanges();
 
             // Seeding categories
             var firstCategory = new Category { Id = Guid.NewGuid(), Name = "Hip Hop", SpotifyId = "hiphop" };
@@ -56,7 +55,39 @@ namespace TSound.Services.Tests.Infrastructure
             var thirdCategory = new Category { Id = Guid.NewGuid(), Name = "Rock", SpotifyId = "rock" };
 
             dbContext.AddRange(firstCategory, secondCategory, thirdCategory);
+
+            // Seeding Playlist
+            var playlistOne = new Playlist { Id = Guid.NewGuid(), Name = "First Playlist", Description = "First Description" };
+            var playlistTwo = new Playlist { Id = Guid.NewGuid(), Name = "Second Playlist", Description = "Second Description" };
+            var playlistThree = new Playlist { Id = Guid.NewGuid(), Name = "Third Playlist", Description = "Third Description" };
+
+            dbContext.AddRange(playlistOne, playlistTwo, playlistThree);
+
+            // Seeding Tracks
+            var trackOne = new Track { Id = Guid.NewGuid(), SpotifyId = "testSpotifyIdOne", Name = "Haide pochvai me" };
+            var trackTwo = new Track { Id = Guid.NewGuid(), SpotifyId = "testSpotifyIdTwo", Name = "Sen Trope" };
+            var trackThree = new Track { Id = Guid.NewGuid(), SpotifyId = "testSpotifyIdThree", Name = "Motel" };
+
+            dbContext.AddRange(trackOne, trackTwo, trackThree);
+
+            // Seeding PlaylistCategory
+            var playlistCategoryOne = new PlaylistCategory { CategoryId = firstCategory.Id, PlaylistId = playlistOne.Id };
+            var playlistCategoryOne2 = new PlaylistCategory { CategoryId = secondCategory.Id, PlaylistId = playlistOne.Id };
+            var playlistCategoryTwo = new PlaylistCategory { CategoryId = secondCategory.Id, PlaylistId = playlistTwo.Id };
+            var playlistCategoryThree = new PlaylistCategory { CategoryId = thirdCategory.Id, PlaylistId = playlistThree.Id };
+
+            dbContext.AddRange(playlistCategoryOne, playlistCategoryOne2, playlistCategoryTwo, playlistCategoryThree);
+
+            // Seeding PlaylistTrack
+            var playlistTrackOne = new PlaylistTrack { PlaylistId = playlistOne.Id, TrackId = trackOne.Id };
+            var playlistTrackTwo = new PlaylistTrack { PlaylistId = playlistTwo.Id, TrackId = trackTwo.Id };
+            var playlistTrackThree = new PlaylistTrack { PlaylistId = playlistThree.Id, TrackId = trackThree.Id };
+
+            dbContext.AddRange(playlistTrackOne, playlistTrackTwo, playlistTrackThree);
+
+            // Save all
             dbContext.SaveChanges();
+
 
             DetachAllEntities(dbContext);
             return dbContext;
