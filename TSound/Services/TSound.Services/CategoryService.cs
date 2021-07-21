@@ -20,6 +20,11 @@ namespace TSound.Services
         private readonly IMapper mapper;
         private readonly IBrowseApi browseApi;
 
+        public CategoryService()
+        {
+
+        }
+
         public CategoryService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
@@ -44,12 +49,17 @@ namespace TSound.Services
         
         public async Task<IEnumerable<CategoryServiceModel>> GetCategoryByPlaylistIdAsync(Guid playlistId)
         {
-            var categoryFromThisPlaylistServiceModels = await this.unitOfWork.PlaylistCategories.All()
+            if (!this.unitOfWork.Playlists.All().Any(x => x.Id == playlistId))
+            {
+                throw new ArgumentNullException("There is no playlist with such Id in the database.");
+            }
+
+            var categoriesFromThisPlaylistServiceModels = await this.unitOfWork.PlaylistCategories.All()
                 .Where(x => x.PlaylistId == playlistId)
                 .Select(x => this.unitOfWork.Categories.All().First(y => y.Id == x.CategoryId))
                 .ToListAsync();
 
-            return this.mapper.Map<IEnumerable<CategoryServiceModel>>(categoryFromThisPlaylistServiceModels);
+            return this.mapper.Map<IEnumerable<CategoryServiceModel>>(categoriesFromThisPlaylistServiceModels);
         }
 
         public async Task<IEnumerable<CategoryServiceModel>> GetAllCategoriesAsync(bool requireApiKey = false, System.Guid? apiKey = null)

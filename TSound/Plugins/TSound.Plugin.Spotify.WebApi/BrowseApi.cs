@@ -92,6 +92,9 @@ namespace TSound.Plugin.Spotify.WebApi
         /// <remarks> https://developer.spotify.com/documentation/web-api/reference/browse/get-list-categories/ </remarks>
         public async Task<T> GetCategories<T>(string country = null, string locale = null, int? limit = null, int offset = 0, string accessToken = null)
         {
+            if (accessToken == null)
+                accessToken = base._accessToken;
+
             var builder = new UriBuilder($"{BaseUrl}/browse/categories");
             builder.AppendToQueryIfValueNotNullOrWhiteSpace("country", country);
             builder.AppendToQueryIfValueNotNullOrWhiteSpace("locale", locale);
