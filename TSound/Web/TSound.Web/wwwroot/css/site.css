@@ -3,8 +3,6 @@ for details on configuring this project to bundle and minify static web assets. 
 
 
 @import Url(template/black-dashboard.css);
-@import Url(template/black-dashboard.css.map);
-@import Url(template/black-dashboard.min.css);
 @import Url(template/nucleo-icons.css);
 
 @font-face {
