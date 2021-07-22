@@ -1,15 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Web.Http;
-using TSound.Data.Models;
-using TSound.Plugin.Spotify.WebApi.Authorization;
 using TSound.Plugin.Spotify.WebApi.Http;
 using TSound.Plugin.Spotify.WebApi.SpotifyModels;
 

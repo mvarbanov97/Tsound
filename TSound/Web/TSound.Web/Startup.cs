@@ -1,9 +1,7 @@
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +18,6 @@ using TSound.Services.Contracts;
 using TSound.Web.MappingConfiguration;
 using TSound.Services.Providers;
 using TSound.Data.Seeder.Seeding;
-using System.Web.Http;
 using TSound.Services.External;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authentication;
@@ -112,11 +109,6 @@ namespace TSound.Web
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient<IApplicationCloudinary, ApplicationCloudinary>();
-
-            services.AddControllersAsServices(typeof(Startup).Assembly.GetExportedTypes()
-                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
-                .Where(t => typeof(ApiController).IsAssignableFrom(t)
-                    || t.Name.EndsWith("Api", StringComparison.OrdinalIgnoreCase)));
 
             services.AddHttpClient();
 
